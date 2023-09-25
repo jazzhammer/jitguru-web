@@ -38,6 +38,24 @@
       alreadyUsername = !!responseJson.matched;
     }
   }
+  async function createUser() {
+    let createResponse = await fetch(`${API_BASE_URL}users`, {
+      method: 'POST',
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        username,
+        password,
+        email
+      })
+    });
+    let createJson = await createResponse.json();
+    if (createJson.created) {
+      console.log(`created user: ${createJson.created.last_name}`);
+    } else {
+      console.log(`created user failed: ${createJson.message}`);
+    }
+  }
 
   function checkMatchPasswords(e) {
     if (password && repeatPassword) {
@@ -129,7 +147,7 @@
         {/if}
         {#if canCreate}
           <div class="mt-1 font-bold">
-            <button class=" pl-2 pr-2 bg-garden-800">create user account</button>
+            <button class=" pl-2 pr-2 bg-garden-800" on:click={createUser}>create user account</button>
           </div>
         {/if}
       </div>
