@@ -2,20 +2,15 @@
 export default {
   plugins: [],
   theme: {
-    extend: {},
-  },
-  purge: ["./index.html",'./src/**/*.{svelte,js,ts}'], //for unused css
-  variants: {
     extend: {
       colors: {
         stone: {
-
           900: '#dee1e3',
           800: '#c3c7cb',
-          700: '#a7aeb4',
+          700: '#a7aeb4', // landing white
           600: '#8c959c',
           500: '#717b84',
-          400: '#42484d',
+          400: '#42484d', // landing bg
           300: '#2a2e32',
           200: '#131516',
           100: '#000000'
@@ -24,7 +19,7 @@ export default {
           1100: '#eff3f5',
           1000: '#dfe7eb',
           900: '#cfdae2',
-          800: '#bfced8',
+          800: '#bfced8', // base bg
           700: '#b0c2ce',
           600: '#90aabb',
           500: '#809eb1',
@@ -64,7 +59,7 @@ export default {
           800: '#4f00ca',
           700: '#4900ba',
           600: '#4300ab',
-          500: '#3d009c',
+          500: '#3d009c', //  hover action
           400: '#31007d',
           300: '#2b006e',
           200: '#25005e',
@@ -86,7 +81,7 @@ export default {
           800: '#f93d00',
           700: '#e43800',
           600: '#d03300',
-          500: '#a72900',
+          500: '#a72900', // logo large, for landing
           400: '#932400',
           300: '#7e1f00',
           200: '#6a1a00',
@@ -104,7 +99,11 @@ export default {
           100: '#0f2b00'
         }
       }
-
+    },
+  },
+  purge: ["./index.html",'./src/**/*.{svelte,js,ts}'], //for unused css
+  variants: {
+    extend: {
     },
   },
   darkmode: false, // or 'media' or 'class'

@@ -13,7 +13,9 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-
+.logo-large {
+  font-family: 'Passion One', cursive;
+}
 a {
   font-weight: 500;
   color: #646cff;
