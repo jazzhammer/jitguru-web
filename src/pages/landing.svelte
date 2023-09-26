@@ -4,6 +4,11 @@
   import SecurityStore from "../store.js";
   import {onDestroy} from "svelte";
   import {navigate} from'svelte-routing';
+  let defaultUsername = import.meta.env.VITE_DEV_USERNAME
+  let defaultPassword = import.meta.env.VITE_DEV_PASSWORD
+  // if (defaultPassword) {
+  //   document.getElementById('password').value = defaultPassword;
+  // }
 
   let message = '';
 
@@ -21,11 +26,12 @@
   let firstName;
   let lastName;
   let alreadyUsername = false;
-  let username;
-  let password;
+  let username=defaultUsername;
+  let password=defaultPassword;
   let repeatPassword;
   let matchPassword = true;
   let email;
+  console.log(`username: ${username}, password: ${password}`);
 
   $: canAuthenticate = username?.length > 0 &&
     password?.length > 12;
@@ -149,11 +155,11 @@
       <div class="flex flex-col">
         <div class="flex flex-row mt-1">
           <div class="w-64 text-right bg-stone-700 pr-2 font-bold">username:</div>
-          <div class="w-64"><input on:keyup={updateUsername} class="w-64 bg-white pl-2"></div>
+          <div class="w-64"><input on:keyup={updateUsername} class="w-64 bg-white pl-2" value="{defaultUsername ? defaultUsername : null}"></div>
         </div>
         <div class="flex flex-row mt-1">
           <div class="w-64 text-right bg-stone-700 pr-2 font-bold">password:</div>
-          <div class="w-64"><input on:keyup={updatePassword} type="password" class="w-64 bg-white pl-2"></div>
+          <div class="w-64"><input id='username' on:keyup={updatePassword} type="password" class="w-64 bg-white pl-2"></div>
         </div>
         {#if canAuthenticate}
           <div class="mt-1 font-bold">

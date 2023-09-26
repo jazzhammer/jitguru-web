@@ -9,5 +9,5 @@
   onDestroy(()=>{unsub()});
 </script>
 <main>
-  home with {security?.loggedInUser?.last_name}
+
 </main>
