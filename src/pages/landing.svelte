@@ -5,6 +5,8 @@
   import {onDestroy} from "svelte";
   import {navigate} from'svelte-routing';
 
+  let message = '';
+
   let security;
   const unsub = SecurityStore.subscribe(stored => {
     security = stored;
@@ -25,6 +27,9 @@
   let matchPassword = true;
   let email;
 
+  $: canAuthenticate = username?.length > 0 &&
+    password?.length > 12;
+
   $: canCreate = matchPassword &&
     lastName?.length > 0 &&
     firstName?.length > 0 &&
@@ -32,6 +37,33 @@
     password?.length > 12 &&
     repeatPassword?.length == password?.length &&
     matchPassword && validEmail();
+
+  async function authenticateUser() {
+    if (canAuthenticate) {
+      let response = await fetch(
+        `${API_BASE_URL}users`
+        , {
+          method: 'POST',
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        }
+      );
+      let responseJson = await response.json();
+      let loggedInUser = responseJson.authenticated;
+      SecurityStore.update(old => {
+        return {
+          ...old,
+          loggedInUser: loggedInUser
+        }
+      });
+      if (loggedInUser) {
+        navigate('/home');
+      }
+      message = 'authentication failed'
+    }
+  }
 
   async function checkDupeUsername(e) {
     username = e.target.value;
@@ -75,6 +107,10 @@
     }
   }
 
+  function updateUsername(e) {
+    username = e.target.value;
+    username = username?.trim();
+  }
   function updatePassword(e) {
     password = e.target.value;
     password = password?.trim();
@@ -111,14 +147,19 @@
     <div class="p-1 bg-leather-600 border-2 border-leather-100 m-2 rounded-lg">
       <div class="text-white font-bold pb-2 text-xl">login</div>
       <div class="flex flex-col">
-        <div class="flex flex-row">
+        <div class="flex flex-row mt-1">
           <div class="w-64 text-right bg-stone-700 pr-2 font-bold">username:</div>
-          <div class="w-64"><input class="w-64 bg-white pl-2"></div>
+          <div class="w-64"><input on:keyup={updateUsername} class="w-64 bg-white pl-2"></div>
         </div>
         <div class="flex flex-row mt-1">
           <div class="w-64 text-right bg-stone-700 pr-2 font-bold">password:</div>
-          <div class="w-64"><input type="password" class="w-64 bg-white pl-2"></div>
+          <div class="w-64"><input on:keyup={updatePassword} type="password" class="w-64 bg-white pl-2"></div>
         </div>
+        {#if canAuthenticate}
+          <div class="mt-1 font-bold">
+            <button class=" pl-2 pr-2 bg-garden-800" on:click={authenticateUser}>authenticate</button>
+          </div>
+        {/if}
       </div>
       <div class="bg-leather-900 mt-2 mb-2 font-bold text-xl text-white">or</div>
       <div on:click={toggleMode} class="text-white hover:text-stone-800 cursor-pointer font-bold pb-2 text-xl">register</div>
@@ -166,5 +207,8 @@
       <div class="bg-leather-900 mt-2 mb-2 font-bold text-xl text-white">or</div>
       <div on:click={toggleMode} class="text-white hover:text-stone-800 cursor-pointer font-bold pb-2 text-xl">login</div>
     </div>
+  {/if}
+  {#if message}
+    <div class="bg-white text-leather-500">{message}</div>
   {/if}
 </main>
