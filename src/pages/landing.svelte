@@ -1,6 +1,15 @@
 <script>
   import TailwindCss from '../lib/TailwindCSS.svelte';
   import {API_BASE_URL} from "../settings/api-settings.js";
+  import SecurityStore from "../store.js";
+  import {onDestroy} from "svelte";
+  import {navigate} from'svelte-routing';
+
+  let security;
+  const unsub = SecurityStore.subscribe(stored => {
+    security = stored;
+  });
+  onDestroy(()=>{unsub()});
 
   let mode = 'login';
   function toggleMode(e) {
@@ -51,7 +60,10 @@
     });
     let createJson = await createResponse.json();
     if (createJson.created) {
-      console.log(`created user: ${createJson.created.last_name}`);
+      SecurityStore.update(old =>{
+        return {...old, loggedInUser: createJson.created}
+      });
+      navigate('/home');
     } else {
       console.log(`created user failed: ${createJson.message}`);
     }
