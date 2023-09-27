@@ -61,13 +61,15 @@
       SecurityStore.update(old => {
         return {
           ...old,
-          loggedInUser: loggedInUser
+          loggedInUser: loggedInUser,
+          permissions: []
         }
       });
       if (loggedInUser) {
         navigate('/home');
+      } else {
+        message = 'authentication failed';
       }
-      message = 'authentication failed'
     }
   }
 
@@ -147,8 +149,8 @@
 </script>
 <TailwindCss/>
 
-<main class="align-middle text-black">
-  <div class="logo-large text-9xl">jitguru</div>
+<main class="flex flex-col text-black items-center justify-center w-screen m-0 h-full">
+  <div class="logo-text text-9xl">jitguru</div>
   {#if mode === 'login'}
     <div class="p-1 bg-leather-600 border-2 border-leather-100 m-2 rounded-lg">
       <div class="text-white font-bold pb-2 text-xl">login</div>

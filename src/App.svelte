@@ -7,10 +7,10 @@
 </script>
 
 <TailwindCss/>
-<main class="flex items-center justify-center w-full p-0 m-0 h-full border-2 bg-milden-800">
+<main class="flex p-0 h-full w-full border-2 bg-milden-800 m-0">
   <Router {url} >
     <div>
-      <Route path="/home"><Home /></Route>
+      <Route path="/home"><Home/></Route>
       <Route path="/"><Landing/></Route>
     </div>
   </Router>
