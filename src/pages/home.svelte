@@ -4,6 +4,12 @@
 
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
+  import OrgsStore from "../orgs-store.js";
+
+  let orgs;
+  const unsubOrgs = OrgsStore.subscribe(stored => {
+    orgs = stored;
+  });
 
   let permissions;
   const unsubPermissions = PermissionsStore.subscribe(stored => {
@@ -14,7 +20,7 @@
   const unsub = SecurityStore.subscribe(async stored => {
     security = stored;
     if (security && security['loggedInUser']) {
-      const response = await fetch(`${API_BASE_URL}users/permission?user_id=${security['loggedInUser'].id}&permission=assign_org_to_self`
+      let response = await fetch(`${API_BASE_URL}users/permission?user_id=${security['loggedInUser'].id}&permission=assign_org_to_self`
         , {
           method: 'GET'
         });
@@ -28,13 +34,25 @@
           }
         })
       }
-      // debugger;
+      response = await fetch(`${API_BASE_URL}users/orgs?user_id=${security['loggedInUser'].id}`,{
+        method: 'GET'
+      });
+      const orgsJson = await response.json();
+      OrgsStore.update(old => {
+        console.log(`assigning orgs: ${orgsJson.assigned}`);
+        return {
+          ...old,
+          "assigned": orgsJson.assigned
+        }
+      });
+
     }
 
   });
   onDestroy(()=>{
     unsub();
     unsubPermissions();
+    unsubOrgs();
   });
 
 
@@ -54,5 +72,13 @@
       {/if}
     {/if}
   </div>
-
+  <div class="flex flex-col">
+    {#if orgs.assigned}
+      {#each orgs.assigned as org}
+        <div>{org.name}</div>
+      {/each}
+    {:else}
+      orgs: {JSON.stringify(orgs)}
+    {/if}
+  </div>
 </main>
