@@ -40,10 +40,16 @@
       const orgsJson = await response.json();
       OrgsStore.update(old => {
         console.log(`assigning orgs: ${orgsJson.assigned}`);
-        return {
+        const next = {
           ...old,
-          "assigned": orgsJson.assigned
+          "assigned": orgsJson.assigned,
+        };
+        if (!old['selected']) {
+          if (orgsJson.assigned.length > 0) {
+            next['selected'] = orgsJson.assigned[0];
+          }
         }
+        return next;
       });
 
     }
@@ -62,23 +68,14 @@
   <div id="banner" class="h-7 bg-garden-200 text-white mr-1 flex flex-row">
     <div id="banner" class=" bg-garden-200 text-white text-left logo-text pl-2" style="padding-top: 2px">jitguru</div>
     <div class="text-sm pt-1 ml-2">{security?.loggedInUser?.first_name.toLowerCase()}</div>
-    {#if security}
-      {#if security.selectedOrg}
-        <div class="text-sm pt-1 ml-2">@{security?.selectdOrg?.name}</div>
-      {:else if !security.selectedOrg}
+    {#if orgs}
+      {#if orgs.selected}
+        <div class="text-sm pt-1 ml-2">@{orgs?.selected?.name}</div>
+      {:else if !orgs.selected}
         {#if permissions?.assign_org_to_self}
-          <div class="text-sm pt-1 ml-2">+</div>
+          <div class="ml-2 cursor:pointer">+</div>
         {/if}
       {/if}
-    {/if}
-  </div>
-  <div class="flex flex-col">
-    {#if orgs.assigned}
-      {#each orgs.assigned as org}
-        <div>{org.name}</div>
-      {/each}
-    {:else}
-      orgs: {JSON.stringify(orgs)}
     {/if}
   </div>
 </main>
