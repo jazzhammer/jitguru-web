@@ -31,7 +31,6 @@
   let repeatPassword;
   let matchPassword = true;
   let email;
-  console.log(`username: ${username}, password: ${password}`);
 
   $: canAuthenticate = username?.length > 0 &&
     password?.length > 12;
@@ -68,7 +67,7 @@
       if (loggedInUser) {
         navigate('/home');
       } else {
-        message = 'authentication failed';
+        message = 'authentication failed'
       }
     }
   }

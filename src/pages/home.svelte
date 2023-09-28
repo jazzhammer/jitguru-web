@@ -1,11 +1,11 @@
 <script>
   import SecurityStore from "../store.js";
   import PermissionsStore from "../permissions-store.js";
-
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import OrgsStore from "../orgs-store.js";
+  import OrgSelector from "./org-selector.svelte";
 
+  import OrgsStore from "../orgs-store.js";
   let orgs;
   const unsubOrgs = OrgsStore.subscribe(stored => {
     orgs = stored;
@@ -39,7 +39,6 @@
       });
       const orgsJson = await response.json();
       OrgsStore.update(old => {
-        console.log(`assigning orgs: ${orgsJson.assigned}`);
         const next = {
           ...old,
           "assigned": orgsJson.assigned,
@@ -61,7 +60,15 @@
     unsubOrgs();
   });
 
-
+  let orgSelector = false;
+  function showOrgSelector(show) {
+    console.log(`showOrgSelector(${show})`)
+    orgSelector = show;
+  }
+  function toggleOrgSelector() {
+    console.log(`toggleOrgSelector()`)
+    orgSelector = !orgSelector;
+  }
 
 </script>
 <main class="flex flex-col text-black m-0 h-full w-screen">
@@ -70,7 +77,16 @@
     <div class="text-sm pt-1 ml-2">{security?.loggedInUser?.first_name.toLowerCase()}</div>
     {#if orgs}
       {#if orgs.selected}
-        <div class="text-sm pt-1 ml-2">@{orgs?.selected?.name}</div>
+        <div class="relative">
+          <div class="text-sm pt-1 ml-2 cursor-pointer relative" on:click={() => toggleOrgSelector()}>
+            @{orgs?.selected?.name}
+          </div>
+          {#if orgSelector}
+            <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm">
+              <OrgSelector on:selectedOrg={() => {showOrgSelector(false)}}></OrgSelector>
+            </div>
+          {/if}
+        </div>
       {:else if !orgs.selected}
         {#if permissions?.assign_org_to_self}
           <div class="ml-2 cursor:pointer">+</div>
