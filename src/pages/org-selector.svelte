@@ -1,13 +1,21 @@
 <script>
+  import {API_BASE_URL} from "../settings/api-settings.js";
+  import {PREF_SELECTED_ORG_ID} from "../models/user-preference.js"
   import {createEventDispatcher} from "svelte";
   import OrgsStore from "../orgs-store.js";
   import {onDestroy} from "svelte";
+  import SecurityStore from "../store.js";
   const dispatch = createEventDispatcher();
   let orgs;
   const unsubOrgs = OrgsStore.subscribe(old => {
     orgs = old
   });
   onDestroy(()=>unsubOrgs())
+
+  let security;
+  const unsubSecurity = SecurityStore.subscribe(old => {
+    security = old;
+  });
 
   const selectOrg = (org) => {
     OrgsStore.update(old => {
@@ -16,8 +24,23 @@
         selected: org
       }
     });
+    if (security.loggedInUser) {
+      fetch(`${API_BASE_URL}users/preference`, {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: security.loggedInUser.id,
+          name: PREF_SELECTED_ORG_ID,
+          value: org.id
+        })
+      });
+    }
     dispatch('selectedOrg', org);
   }
+
+  onDestroy(()=>{
+    unsubSecurity();
+    unsubOrgs();
+  })
 </script>
 <main class="flex flex-col w-64 text-black text-left">
   <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200">goto another org:</div>
