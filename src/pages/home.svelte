@@ -1,11 +1,18 @@
 <script>
   import SecurityStore from "../store.js";
   import PermissionsStore from "../permissions-store.js";
+  import OrgsStore from "../orgs-store.js";
+  import UserPreferencesStore from '../user-preferences-store.js';
+  import {PREF_SELECTED_ORG_ID} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
   import OrgSelector from "./org-selector.svelte";
 
-  import OrgsStore from "../orgs-store.js";
+  let userPreferences;
+  const unsubUserPreferences = UserPreferencesStore.subscribe(stored => {
+    userPreferences = stored;
+  });
+
   let orgs;
   const unsubOrgs = OrgsStore.subscribe(stored => {
     orgs = stored;
@@ -51,13 +58,38 @@
         return next;
       });
 
-    }
+      response = await fetch(`${API_BASE_URL}users/preference?user_id=${security['loggedInUser'].id}`, {
+        method: 'GET'
+      })
+      const preferences = JSON.parse(await response.json());
 
+      const unsubUserPreferences = UserPreferencesStore.subscribe(old => {
+        userPreferences = old;
+      });
+      if (preferences && preferences.length > 0) {
+        const found = preferences.find((pref) => {
+          return pref.name === PREF_SELECTED_ORG_ID;
+        })
+        if (found) {
+          response = await fetch(`${API_BASE_URL}orgs/${found.value}`, {method: 'GET'});
+          const orgJson = await response.json();
+          OrgsStore.update(old => {
+            return {
+              ...old,
+              selected: orgJson
+            }
+          })
+        }
+       }
+
+    }
   });
+
   onDestroy(()=>{
     unsub();
     unsubPermissions();
     unsubOrgs();
+    unsubUserPreferences();
   });
 
   let orgSelector = false;
@@ -68,6 +100,15 @@
   function toggleOrgSelector() {
     console.log(`toggleOrgSelector()`)
     orgSelector = !orgSelector;
+  }
+
+  const preferenceFor =  (name) => {
+    if (userPreferences) {
+      const found = userPreferences.find((pref) => {
+        return pref.name === name;
+      })
+      if (found) return found.value;
+    }
   }
 
 </script>
