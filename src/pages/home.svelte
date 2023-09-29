@@ -1,8 +1,8 @@
 <script>
-  import SecurityStore from "../store.js";
-  import PermissionsStore from "../permissions-store.js";
-  import OrgsStore from "../orgs-store.js";
-  import UserPreferencesStore from '../user-preferences-store.js';
+  import SecurityStore from "../stores/security-store.js";
+  import PermissionsStore from "../stores/permissions-store.js";
+  import OrgsStore from "../stores/orgs-store.js";
+  import UserPreferencesStore from '../stores/user-preferences-store.js';
   import {PREF_SELECTED_ORG_ID} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
@@ -27,11 +27,12 @@
   const unsub = SecurityStore.subscribe(async stored => {
     security = stored;
     if (security && security['loggedInUser']) {
+
       let response = await fetch(`${API_BASE_URL}users/permission?user_id=${security['loggedInUser'].id}&permission=assign_org_to_self`
         , {
           method: 'GET'
         });
-      const permissionJson = await response.json();
+      let permissionJson = await response.json();
       if (permissionJson['hasPermission']) {
         // permissions.push('assign_org_to_self');
         PermissionsStore.update(old => {
@@ -41,6 +42,23 @@
           }
         })
       }
+
+      response = await fetch(`${API_BASE_URL}users/permission?user_id=${security['loggedInUser'].id}&permission=add_org`
+        , {
+          method: 'GET'
+        });
+      permissionJson = await response.json();
+      if (permissionJson['hasPermission']) {
+        // permissions.push('assign_org_to_self');
+        PermissionsStore.update(old => {
+          return {
+            ...old,
+            add_org: permissionJson['hasPermission']
+          }
+        })
+      }
+
+
       response = await fetch(`${API_BASE_URL}users/orgs?user_id=${security['loggedInUser'].id}`,{
         method: 'GET'
       });
@@ -63,9 +81,6 @@
       })
       const preferences = JSON.parse(await response.json());
 
-      const unsubUserPreferences = UserPreferencesStore.subscribe(old => {
-        userPreferences = old;
-      });
       if (preferences && preferences.length > 0) {
         const found = preferences.find((pref) => {
           return pref.name === PREF_SELECTED_ORG_ID;
@@ -102,14 +117,14 @@
     orgSelector = !orgSelector;
   }
 
-  const preferenceFor =  (name) => {
-    if (userPreferences) {
-      const found = userPreferences.find((pref) => {
-        return pref.name === name;
-      })
-      if (found) return found.value;
-    }
-  }
+  // const preferenceFor =  (name) => {
+  //   if (userPreferences) {
+  //     const found = userPreferences.find((pref) => {
+  //       return pref.name === name;
+  //     })
+  //     if (found) return found.value;
+  //   }
+  // }
 
 </script>
 <main class="flex flex-col text-black m-0 h-full w-screen">
@@ -119,18 +134,18 @@
     {#if orgs}
       {#if orgs.selected}
         <div class="relative">
-          <div class="text-sm pt-1 ml-2 cursor-pointer relative" on:click={() => toggleOrgSelector()}>
+          <div class="text-sm pt-1 ml-2 cursor-pointer relative" on:click={() => toggleOrgSelector()} role="button" tabindex="0">
             @{orgs?.selected?.name}
           </div>
           {#if orgSelector}
             <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm">
-              <OrgSelector on:selectedOrg={() => {showOrgSelector(false)}}></OrgSelector>
+              <OrgSelector on:selectedOrg={() => {showOrgSelector(false)}} on:createdOrg={() => {showOrgSelector(false)}}></OrgSelector>
             </div>
           {/if}
         </div>
       {:else if !orgs.selected}
         {#if permissions?.assign_org_to_self}
-          <div class="ml-2 cursor:pointer">+</div>
+          <div class="ml-2 cursor:pointer" on:click={() => toggleOrgSelector()} role="button" tabindex="0">+</div>
         {/if}
       {/if}
     {/if}

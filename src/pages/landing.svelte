@@ -1,7 +1,7 @@
 <script>
   import TailwindCss from '../lib/TailwindCSS.svelte';
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import SecurityStore from "../store.js";
+  import SecurityStore from "../stores/security-store.js";
   import {onDestroy} from "svelte";
   import {navigate} from'svelte-routing';
   let defaultUsername = import.meta.env.VITE_DEV_USERNAME
