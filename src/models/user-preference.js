@@ -1,1 +1,1 @@
-export const PREF_SELECTED_ORG_ID = "selected_org";
+export const PREF_SELECTED_ORG_ID = "selected_org_id";

@@ -2,7 +2,7 @@
   import {API_BASE_URL} from "../settings/api-settings.js";
   import {PREF_SELECTED_ORG_ID} from "../models/user-preference.js"
   import {createEventDispatcher} from "svelte";
-  import OrgsStore from "../stores/orgs-store.js";
+  import OrgsStore, {ACTION_SELECTED} from "../stores/orgs-store.js";
   import {onDestroy} from "svelte";
   import PermissionsStore from "../stores/permissions-store.js";
   import SecurityStore from "../stores/security-store.js";
@@ -18,8 +18,8 @@
 
   const dispatch = createEventDispatcher();
   let orgs;
-  const unsubOrgs = OrgsStore.subscribe(old => {
-    orgs = old
+  const unsubOrgs = OrgsStore.subscribe(stored => {
+    orgs = stored
   });
 
   let security;
@@ -31,7 +31,8 @@
     OrgsStore.update(old => {
       return {
         ...old,
-        selected: org
+        selected: org,
+        action: ACTION_SELECTED
       }
     });
     if (security.loggedInUser) {
