@@ -2,12 +2,14 @@
   import SecurityStore from "../stores/security-store.js";
   import PermissionsStore from "../stores/permissions-store.js";
   import FacilitysStore from "../stores/facilitys-store.js";
+  import MeetupSpotsStore from "../stores/meetup_spots-store.js";
   import OrgsStore from "../stores/orgs-store.js";
   import UserPreferencesStore from '../stores/user-preferences-store.js';
   import {PREF_SELECTED_ORG_ID} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
   import OrgSelector from "./org-selector.svelte";
+  import MeetupSpotSelector from "./meetup-spot-selector.svelte";
   import FacilitySelector from "./facility-selector.svelte";
 
   let preferences;
@@ -29,6 +31,11 @@
   let facilitys = {};
   const unsubFacilitys = FacilitysStore.subscribe(stored => {
     facilitys = stored;
+  });
+
+  let meetup_spots = {};
+  const unsubMeetupSpots = MeetupSpotsStore.subscribe(stored => {
+    meetup_spots = stored;
   });
 
   /**                                .__  __                          __
@@ -67,8 +74,7 @@
       await setupPermissions(user_id);
       await setupPreferences(user_id);
       await setupUserOrgs(user_id);
-      // await setupFacilitys(user_id);
-      // await setupLocations(user_id);
+
     }
   });
 
@@ -78,6 +84,7 @@
     unsubPreferences();
     unsubOrgs();
     unsubFacilitys();
+    unsubMeetupSpots();
   });
 
 
@@ -211,6 +218,21 @@
   function toggleOrgSelector() {
     console.log(`toggleOrgSelector()`)
     orgSelector = !orgSelector;
+    meetupSpotSelector = false;
+    facilitySelector = false;
+  }
+
+  $: meetupSpotSelector = false;
+  function showMeetupSpotSelector(show) {
+    console.log(`showMeetupSpotSelector(${show})`)
+    meetupSpotSelector = show;
+  }
+
+  function toggleMeetupSpotSelector() {
+    console.log(`toggleOrgSelector()`)
+    meetupSpotSelector = !meetupSpotSelector;
+    orgSelector = false;
+    facilitySelector = false;
   }
 
   $: facilitySelector = false;
@@ -222,13 +244,15 @@
   function toggleFacilitySelector() {
     console.log(`toggleOrgSelector()`)
     facilitySelector = !facilitySelector;
+    orgSelector = false;
+    meetupSpotSelector = false;
   }
 
   async function onSelectOrg(dispatchEvent) {
     showOrgSelector(false);
     const org = dispatchEvent.detail;
     if (org) {
-      console.log(`retrieve facilitys for org ${org.id}`)
+      console.log(`retrieve facilitys for org[${org.id}]`)
       const response = await fetch(`${API_BASE_URL}facilitys?org_id=${org.id}`, {
         method: 'GET'
       });
@@ -236,34 +260,37 @@
       const next = {
         facilitys: facilitysJson.matched
       }
-
+      console.log(`retrieved facilitys ${next.facilitys?.length}`)
       FacilitysStore.update(old => {
-        if (!old.selected && next.facilitys && next.facilitys.length > 0) {
+        if (next.facilitys && next.facilitys.length > 0) {
           next.selected = next.facilitys[0];
+        } else {
+          next.selected = null
         }
         return next;
       });
     }
   }
 
-  async function onSelectFacility(dispatchEvent) {
-    showFacilitySelector(false);
-    const facility = dispatchEvent.detail;
-    if (facility) {
-      // should we load facility's locations? could be a pretty big list.
-      // cuz we're probably talking rooms here.
-      // const response = await fetch(`${API_BASE_URL}facilitys?org_id=${org.id}`, {
-      //   method: 'GET'
-      // });
-      // const facilitysJson = await response.json();
-      // FacilitysStore.update(old => {
-      //   return {
-      //     ...old,
-      //     facilitys: facilitysJson.matched
-      //   }
-      // });
+  async function onSelectMeetupSpot(dispatchEvent) {
+    showMeetupSpotSelector(false);
+    const meetupSpot = dispatchEvent.detail;
+    if (meetupSpot) {
+
     }
   }
+
+  async function onSelectFacility(dispatchEvent) {
+    showFacilitySelector(false);
+    FacilitysStore.update(old => {
+      return {
+        ...old,
+        selected: dispatchEvent.detail
+      }
+    });
+  }
+
+
 </script>
 <main class="flex flex-col text-black m-0 h-full w-screen w-min-500">
   <div id="banner" class="h-7 bg-garden-200 text-white mr-1 flex flex-row">
@@ -292,8 +319,15 @@
     {/if}
     <div class="relative mb-0 cursor-pointer">
       <div on:click={toggleFacilitySelector} role="button" class="flex flex-row cursor-pointer">
-        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">facility</div>
-        <div class="text-sm pt-1 pl-1">{facilitys.selected?.name}</div>
+        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
+          facility
+        </div>
+        {#if facilitys && facilitys.selected}
+          <div class="text-sm pt-1 pl-1">{facilitys.selected?.name}</div>
+        {:else}
+          <div class="text-sm pt-1 pl-1">select a facility...</div>
+        {/if}
+
       </div>
       {#if facilitySelector}
         <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black">
@@ -301,12 +335,22 @@
         </div>
       {/if}
     </div>
-<!--    <div class="relative mb-0 cursor-pointer">-->
-<!--      <div on:click={() => facilitySelector=!facilitySelector} role="button" class="flex flex-row cursor-pointer">-->
-<!--        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">permissions</div>-->
-<!--        {JSON.stringify(permissions)}-->
-<!--      </div>-->
-<!--    </div>-->
-
+    <div class="relative mb-0 cursor-pointer">
+      <div on:click={toggleMeetupSpotSelector} role="button" class="flex flex-row cursor-pointer">
+        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
+          spot
+        </div>
+        {#if meetup_spots && meetup_spots.selected}
+          <div class="text-sm pt-1 pl-1">{meetup_spots.selected.name}</div>
+        {:else}
+          <div class="text-sm pt-1 pl-1">select a spot...</div>
+        {/if}
+      </div>
+      {#if meetupSpotSelector}
+        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black">
+          <MeetupSpotSelector on:selectedMeetupSpot={onSelectMeetupSpot}></MeetupSpotSelector>
+        </div>
+      {/if}
+    </div>
   </div>
 </main>

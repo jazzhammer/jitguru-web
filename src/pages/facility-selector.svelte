@@ -1,6 +1,6 @@
 <script>
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_ORG_ID} from "../models/user-preference.js"
+  import {PREF_SELECTED_FACILITY_ID} from "../models/user-preference.js"
   import {createEventDispatcher, onDestroy} from "svelte";
   import FacilitysStore from "../stores/facilitys-store.js";
   import OrgsStore from "../stores/orgs-store.js";
@@ -39,18 +39,12 @@
   });
 
   const selectFacility = (facility) => {
-    FacilitysStore.update(old => {
-      return {
-        ...old,
-        selected: facility
-      }
-    });
     if (security.loggedInUser) {
       fetch(`${API_BASE_URL}users/preference`, {
         method: 'POST',
         body: JSON.stringify({
           user_id: security.loggedInUser.id,
-          name: PREF_SELECTED_ORG_ID,
+          name: PREF_SELECTED_FACILITY_ID,
           value: facility.id
         })
       });
