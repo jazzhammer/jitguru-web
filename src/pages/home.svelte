@@ -288,6 +288,16 @@
         selected: dispatchEvent.detail
       }
     });
+    /**
+     * unlike the way we retrieve all the facilities of an org,
+     * we don't retrieve all the meetupSpots for a facility.
+     * that would likely be a lot of meetupSpots. eg. we'd be retrieving rooms in a facility.
+     * instead we retrieve a set of meetupSpots that the user has visited at the facility,
+     * and allow the user to manage this list. eg.
+     * if the user frequents a set of spots for some time and then things change and they
+     * regularly visit a different set of spots, the user has the option of removing the spots
+     * they no longer visit
+     */
   }
 
 

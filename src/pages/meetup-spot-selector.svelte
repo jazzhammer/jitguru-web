@@ -64,7 +64,6 @@
 
 </script>
 <main class="flex flex-col w-64 text-black text-left">
-  meetupSpots: {meetup_spots?.meetup_spots?.length}
   {#if meetup_spots && meetup_spots.meetup_spots?.length > 0}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
       {#if mode!=='select_meetup_spot'}
