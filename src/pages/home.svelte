@@ -12,6 +12,7 @@
   import OrgSelector from "./org-selector.svelte";
   import MeetupSpotSelector from "./meetup-spot-selector.svelte";
   import FacilitySelector from "./facility-selector.svelte";
+  import {navigate} from "svelte-routing";
 
   let preferences;
   const unsubPreferences = UserPreferencesStore.subscribe(stored => {
@@ -113,7 +114,7 @@
       acc[val] = true;
       return acc;
     }, {});
-    console.log(`permissions hash: ${JSON.stringify(permissionsHash)}`);
+    // console.log(`permissions hash: ${JSON.stringify(permissionsHash)}`);
     PermissionsStore.update(old => {
       return permissionsHash
     });
@@ -124,10 +125,10 @@
     const groupsResponseJson = await groupsResponse.json();
     const groupsArrayJson = groupsResponseJson['user_groups'];
     const groupsHash = groupsArrayJson.reduce((acc, val) => {
-      acc[val] = true;
+      acc[val['name']] = true;
       return acc;
     }, {});
-    console.log(`groups hash: ${JSON.stringify(groupsHash)}`);
+    // console.log(`groups hash: ${JSON.stringify(groupsHash)}`);
     UserGroupsStore.update(old => {
       return groupsHash
     });
@@ -150,7 +151,7 @@
       acc[pref.name] = pref.value;
       return acc;
     }, {});
-    console.log(`preferences hash: ${JSON.stringify(preferencesHash)}`);
+    // console.log(`preferences hash: ${JSON.stringify(preferencesHash)}`);
     UserPreferencesStore.update(old => {
       return preferencesHash
     });
@@ -170,10 +171,10 @@
         assigned: orgsJson.assigned,
         selected: null
       }
-      console.log(`stored assigned orgs: ${JSON.stringify(next.assigned)}`);
+      // console.log(`stored assigned orgs: ${JSON.stringify(next.assigned)}`);
       if (orgsJson.assigned && orgsJson.assigned.length > 0) {
         if (preferences) {
-          console.log(`preferences: ${JSON.stringify(preferences)}`);
+          // console.log(`preferences: ${JSON.stringify(preferences)}`);
           if (preferences[PREF_SELECTED_ORG_ID]) {
             next.selected = orgsJson.assigned.find(org => {
               console.log(`org.id ${org.id} vs ${parseInt(preferences[PREF_SELECTED_ORG_ID])}`);
@@ -263,6 +264,7 @@
   }
 
   function isAdmin() {
+    console.log(`userGroups['admins'] ${userGroups['admins']}`);
     return !!userGroups['admins'];
   }
 
@@ -316,6 +318,10 @@
      * regularly visit a different set of spots, the user has the option of removing the spots
      * they no longer visit
      */
+  }
+
+  function navigateAdminTools() {
+    navigate('/admin_tools')
   }
 
 
