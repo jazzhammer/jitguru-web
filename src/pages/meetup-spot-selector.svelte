@@ -72,9 +72,9 @@
         <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='select_meetup_spot'}
-        <div on:click={() => mode = 'select_meetup_spot'} class="cursor-pointer hover:text-garden-400">goto to another meetup_spot:</div>
+        <div on:click={() => mode = 'select_meetup_spot'} class="cursor-pointer hover:text-garden-400">go to another meetup_spot:</div>
       {:else}
-        <div class="">goto to another meetup_spot:</div>
+        <div class="">go to another meetup_spot:</div>
       {/if}
     </div>
     {#if mode==='select_meetup_spot'}

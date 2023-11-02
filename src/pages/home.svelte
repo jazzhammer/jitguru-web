@@ -4,6 +4,7 @@
   import FacilitysStore from "../stores/facilitys-store.js";
   import MeetupSpotsStore from "../stores/meetup_spots-store.js";
   import OrgsStore from "../stores/orgs-store.js";
+  import UserGroupsStore from "../stores/user-groups-store.js";
   import UserPreferencesStore from '../stores/user-preferences-store.js';
   import {PREF_SELECTED_ORG_ID} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
@@ -20,6 +21,11 @@
   let permissions;
   const unsubPermissions = PermissionsStore.subscribe(stored => {
     permissions = stored;
+  });
+
+  let userGroups;
+  const unsubUserGroups = UserGroupsStore.subscribe(stored => {
+    userGroups = stored;
   });
 
   let orgs;
@@ -111,6 +117,21 @@
     PermissionsStore.update(old => {
       return permissionsHash
     });
+
+    const groupsResponse = await fetch(`${API_BASE_URL}users/user_groups?user_id=${user_id}`, {
+      method: 'GET'
+    });
+    const groupsResponseJson = await groupsResponse.json();
+    const groupsArrayJson = groupsResponseJson['user_groups'];
+    const groupsHash = groupsArrayJson.reduce((acc, val) => {
+      acc[val] = true;
+      return acc;
+    }, {});
+    console.log(`groups hash: ${JSON.stringify(groupsHash)}`);
+    UserGroupsStore.update(old => {
+      return groupsHash
+    });
+
   }
   /**                      _____
    * _____________   _____/ ____\___________   ____   ____   ____  ____   ______
@@ -192,7 +213,6 @@
       const responseJson = await response.json();
       next.facilitys = responseJson.matched;
     }
-    console.log(`next.facilitys=${JSON.stringify(next.facilitys)}`);
     FacilitysStore.update(old => {
       return next;
     });
@@ -211,12 +231,10 @@
 
   $: orgSelector = false;
   function showOrgSelector(show) {
-    console.log(`showOrgSelector(${show})`)
     orgSelector = show;
   }
 
   function toggleOrgSelector() {
-    console.log(`toggleOrgSelector()`)
     orgSelector = !orgSelector;
     meetupSpotSelector = false;
     facilitySelector = false;
@@ -224,12 +242,10 @@
 
   $: meetupSpotSelector = false;
   function showMeetupSpotSelector(show) {
-    console.log(`showMeetupSpotSelector(${show})`)
     meetupSpotSelector = show;
   }
 
   function toggleMeetupSpotSelector() {
-    console.log(`toggleOrgSelector()`)
     meetupSpotSelector = !meetupSpotSelector;
     orgSelector = false;
     facilitySelector = false;
@@ -237,15 +253,17 @@
 
   $: facilitySelector = false;
   function showFacilitySelector(show) {
-    console.log(`showFacilitySelector(${show})`)
     facilitySelector = show;
   }
 
   function toggleFacilitySelector() {
-    console.log(`toggleOrgSelector()`)
     facilitySelector = !facilitySelector;
     orgSelector = false;
     meetupSpotSelector = false;
+  }
+
+  function isAdmin() {
+    return !!userGroups['admins'];
   }
 
   async function onSelectOrg(dispatchEvent) {
@@ -327,6 +345,14 @@
         {/if}
       {/if}
     {/if}
+
+<!--      _____              .__.__  .__  __-->
+<!--    _/ ____\____    ____ |__|  | |__|/  |_ ___.__. ______-->
+<!--    \   __\\__  \ _/ ___\|  |  | |  \   __<   |  |/  ___/-->
+<!--    |  |   / __ \\  \___|  |  |_|  ||  |  \___  |\___ \-->
+<!--    |__|  (____  /\___  >__|____/__||__|  / ____/____  >-->
+<!--    \/     \/                  \/         \/-->
+
     <div class="relative mb-0 cursor-pointer">
       <div on:click={toggleFacilitySelector} role="button" class="flex flex-row cursor-pointer">
         <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
@@ -345,6 +371,14 @@
         </div>
       {/if}
     </div>
+
+<!--                          __-->
+<!--     ____________   _____/  |_  ______-->
+<!--    /  ___/\____ \ /  _ \   __\/  ___/-->
+<!--    \___ \ |  |_> >  <_> )  |  \___ \-->
+<!--    /____  >|   __/ \____/|__| /____  >-->
+<!--    \/ |__|                    \/-->
+
     <div class="relative mb-0 cursor-pointer">
       <div on:click={toggleMeetupSpotSelector} role="button" class="flex flex-row cursor-pointer">
         <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
@@ -362,5 +396,21 @@
         </div>
       {/if}
     </div>
+
+<!--                .___      .__           __                .__-->
+<!--    _____     __| _/_____ |__| ____   _/  |_  ____   ____ |  |   ______-->
+<!--    \__  \   / __ |/     \|  |/    \  \   __\/  _ \ /  _ \|  |  /  ___/-->
+<!--     / __ \_/ /_/ |  Y Y  \  |   |  \  |  | (  <_> |  <_> )  |__\___ \-->
+<!--    (____  /\____ |__|_|  /__|___|  /  |__|  \____/ \____/|____/____  >-->
+<!--    \/      \/     \/        \/                                \/-->
+    {#if isAdmin()}
+    <div class="relative mb-0 cursor-pointer">
+      <div on:click={navigateAdminTools} role="button" class="flex flex-row cursor-pointer">
+        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
+          tools
+        </div>
+      </div>
+    </div>
+    {/if}
   </div>
 </main>

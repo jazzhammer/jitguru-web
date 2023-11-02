@@ -69,6 +69,8 @@
       } else {
         message = 'authentication failed'
       }
+    } else {
+      message = 'unable to authenticate';
     }
   }
 
@@ -122,6 +124,9 @@
     password = e.target.value;
     password = password?.trim();
     checkMatchPasswords();
+    if (e.key==='Enter') {
+      authenticateUser();
+    }
   }
   function updateRepeatPassword(e) {
     repeatPassword = e.target.value;

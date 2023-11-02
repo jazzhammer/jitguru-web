@@ -72,9 +72,11 @@
         <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='select_facility'}
-        <div on:click={() => mode = 'select_facility'} class="cursor-pointer hover:text-garden-400">goto to another facility:</div>
+        <div on:click={() => mode = 'select_facility'} class="cursor-pointer hover:text-garden-400">go to another facility:</div>
       {:else}
-        <div class="">goto to another facility:</div>
+        {#if facilitys.facilitys && facilitys.facilitys.length > 0}
+          <div class="">go to another facility:</div>
+        {/if}
       {/if}
     </div>
     {#if mode==='select_facility'}
@@ -88,7 +90,7 @@
       {/each}
     {/if}
   {/if}
-  {#if permissions.add_org_facility}
+  {#if permissions['api.add_facility']}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
       {#if mode!=='join_facility'}
         <div on:click={()=>mode='join_facility'} class="cursor-pointer rounded-xl  bg-garden-400 hover:bg-garden-700 pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
@@ -96,7 +98,7 @@
         <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='include_facility'}
-        <div on:click={() => mode = 'join_facility'} class="cursor-pointer hover:text-garden-400">include a facility:</div>
+        <div on:click={() => mode = 'join_facility'} class="cursor-pointer hover:text-garden-400">include a facility in this org:</div>
       {:else}
         <div class="">include a facility:</div>
       {/if}
@@ -107,7 +109,7 @@
       </div>
     {/if}
   {/if}
-  {#if permissions.add_facility}
+  {#if permissions['api.add_facility']}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
       {#if mode!=='create_facility'}
         <div on:click={()=>mode='create_facility'} class="cursor-pointer rounded-xl  bg-garden-400 hover:bg-garden-700 pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>

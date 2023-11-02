@@ -68,9 +68,9 @@
         <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='select_org'}
-        <div on:click={() => mode = 'select_org'} class="cursor-pointer hover:text-garden-400">goto to another org:</div>
+        <div on:click={() => mode = 'select_org'} class="cursor-pointer hover:text-garden-400">go to another org:</div>
       {:else}
-        <div class="">goto to another org:</div>
+        <div class="">go to another org:</div>
       {/if}
     </div>
     {#if mode==='select_org'}
