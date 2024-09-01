@@ -17,7 +17,6 @@
       const response = await fetch(`${API_BASE_URL}meetup_spots?name=${name}`, {
         method: 'GET'
       });
-      debugger;
       const meetupSpotsJson = await response.json();
       if (meetupSpotsJson.matched) {
         MessagesStore.update(old => {

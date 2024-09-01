@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import SecurityStore from "../stores/security-store.js";
   import PermissionsStore from "../stores/permissions-store.js";
   import FacilitysStore from "../stores/facilitys-store.js";
   import MeetupSpotsStore from "../stores/meetup_spots-store.js";
+  import PersonsStore from "../stores/persons-store.js";
   import OrgsStore from "../stores/orgs-store.js";
   import UserGroupsStore from "../stores/user-groups-store.js";
   import UserPreferencesStore from '../stores/user-preferences-store.js';
@@ -11,8 +12,15 @@
   import {API_BASE_URL} from "../settings/api-settings.js";
   import OrgSelector from "./org-selector.svelte";
   import MeetupSpotSelector from "./meetup-spot-selector.svelte";
+  import PersonSelector from "./person-selector.svelte";
   import FacilitySelector from "./facility-selector.svelte";
   import {navigate} from "svelte-routing";
+  import store from "../stores/types.js";
+  import {type Facility} from "../models/facility";
+
+  import Tools from './tools.svelte';
+  import UserService from "../services/user-service";
+  import {type User} from "../models/user";
 
   let preferences;
   const unsubPreferences = UserPreferencesStore.subscribe(stored => {
@@ -35,14 +43,24 @@
     await refreshFacilitys();
   });
 
-  let facilitys = {};
+  let facilitys: {
+    selected?: any
+  };
   const unsubFacilitys = FacilitysStore.subscribe(stored => {
     facilitys = stored;
   });
 
-  let meetup_spots = {};
+  let meetup_spots: {
+    selected?: any
+  };
   const unsubMeetupSpots = MeetupSpotsStore.subscribe(stored => {
     meetup_spots = stored;
+  });
+
+  let persons;
+  $: persons
+  const unsubPersons = PersonsStore.subscribe(async (stored) => {
+    persons = stored;
   });
 
   /**                                .__  __                          __
@@ -73,9 +91,15 @@
    *
    * if after all that, there is a selected org,
    */
-  let security;
+  let security: {
+    loggedInUser: User
+  };
+  $: security;
   const unsubSecurity = SecurityStore.subscribe(async stored => {
-    security = stored;
+    security = stored as {
+      loggedInUser: User
+    };
+    console.log(`next security: ${JSON.stringify(security)}`)
     if (security && security['loggedInUser']) {
       const user_id = security['loggedInUser']['id'];
       await setupPermissions(user_id);
@@ -92,6 +116,7 @@
     unsubOrgs();
     unsubFacilitys();
     unsubMeetupSpots();
+    unsubPersons();
   });
 
 
@@ -177,7 +202,7 @@
           // console.log(`preferences: ${JSON.stringify(preferences)}`);
           if (preferences[PREF_SELECTED_ORG_ID]) {
             next.selected = orgsJson.assigned.find(org => {
-              console.log(`org.id ${org.id} vs ${parseInt(preferences[PREF_SELECTED_ORG_ID])}`);
+              // console.log(`org.id ${org.id} vs ${parseInt(preferences[PREF_SELECTED_ORG_ID])}`);
               return org.id === parseInt(preferences[PREF_SELECTED_ORG_ID]);
             });
             console.log(`stored selected org: ${JSON.stringify(next.selected)}`);
@@ -206,7 +231,11 @@
 
 
   async function refreshFacilitys() {
-    const next = {};
+    const next: {
+      facilitys: Facility[]
+    } = {
+      facilitys: null
+    };
     if (orgs.selected) {
       const response = await fetch(`${API_BASE_URL}facilitys?org_id=${orgs.selected.id}`, {
         method: 'GET'
@@ -239,6 +268,19 @@
     orgSelector = !orgSelector;
     meetupSpotSelector = false;
     facilitySelector = false;
+    personSelector = false;
+  }
+
+  $: personSelector = false;
+  function showPersonSelector(show) {
+    personSelector = show;
+  }
+
+  function togglePersonSelector() {
+    personSelector = !personSelector;
+    meetupSpotSelector = false;
+    facilitySelector = false;
+    orgSelector = false;
   }
 
   $: meetupSpotSelector = false;
@@ -250,6 +292,7 @@
     meetupSpotSelector = !meetupSpotSelector;
     orgSelector = false;
     facilitySelector = false;
+    personSelector = false;
   }
 
   $: facilitySelector = false;
@@ -261,10 +304,11 @@
     facilitySelector = !facilitySelector;
     orgSelector = false;
     meetupSpotSelector = false;
+    personSelector = false;
   }
 
   function isAdmin() {
-    console.log(`userGroups['admins'] ${userGroups['admins']}`);
+
     return !!userGroups['admins'];
   }
 
@@ -272,15 +316,16 @@
     showOrgSelector(false);
     const org = dispatchEvent.detail;
     if (org) {
-      console.log(`retrieve facilitys for org[${org.id}]`)
+
       const response = await fetch(`${API_BASE_URL}facilitys?org_id=${org.id}`, {
         method: 'GET'
       });
       const facilitysJson = await response.json();
       const next = {
-        facilitys: facilitysJson.matched
+        facilitys: facilitysJson.matched,
+        selected: null
       }
-      console.log(`retrieved facilitys ${next.facilitys?.length}`)
+
       FacilitysStore.update(old => {
         if (next.facilitys && next.facilitys.length > 0) {
           next.selected = next.facilitys[0];
@@ -292,11 +337,31 @@
     }
   }
 
+  async function onSelectPerson(dispatchEvent) {
+
+    showPersonSelector(false);
+    const person = dispatchEvent.detail;
+    if (person) {
+      PersonsStore.set({
+        type: store.READ,
+        payload: person
+      });
+    }
+    const nextPersons = {
+      ...persons
+    }
+    nextPersons.selected = person;
+    persons = nextPersons;
+  }
+
   async function onSelectMeetupSpot(dispatchEvent) {
     showMeetupSpotSelector(false);
     const meetupSpot = dispatchEvent.detail;
     if (meetupSpot) {
+      MeetupSpotsStore.set({
+        type: store.READ,
 
+      });
     }
   }
 
@@ -324,12 +389,80 @@
     navigate('/admin_tools')
   }
 
+  let loginMode = false;
+  $: loginMode
+  const setLoginMode = (next: boolean): void => {
+    loginMode = next;
+  }
+  let mode = '';
+  $: mode
+  const setMode = (next: string): void => {
+    mode = next;
+    loginMode = false;
+  }
 
+  let DEFAULT_USER_NAME = 'admin';
+  let username = DEFAULT_USER_NAME;
+  let password = '';
+  let canAuthenticate = false;
+  $: canAuthenticate = username && username.trim().length > 0 && password && password.trim().length > 0
+  let loggedInUser;
+  $: loggedInUser
+
+  const authenticateUser = async () => {
+    loggedInUser = await UserService.authenticate(username, password);
+    SecurityStore.set({
+      loggedInUser
+    });
+    loginMode = false;
+  }
 </script>
 <main class="flex flex-col text-black m-0 h-full w-screen w-min-500">
   <div id="banner" class="h-7 bg-garden-200 text-white mr-1 flex flex-row">
     <div id="banner" class=" bg-garden-200 text-white text-left logo-text pl-2" style="padding-top: 2px">jitguru</div>
-    <div class="text-sm pt-1 ml-2">{security?.loggedInUser?.first_name.toLowerCase()}</div>
+    {#if security && security.loggedInUser}
+      <div class="text-sm pt-1 ml-2">{security.loggedInUser.first_name.toLowerCase()}</div>
+    {:else}
+        <div  class="text-sm pt-1 ml-2 border border-amber-500 my-1 align-middle px-5"
+            style="position: relative; width: 70px;"
+      >
+        <div on:click={() => setLoginMode(true)}
+              class="hover:bg-amber-100 hover:text-amber-800 cursor-pointer"
+              style="position: absolute; top: 0px; left: 0px; width: 70px;">
+          login
+        </div>
+        {#if loginMode}
+          <div style="position: absolute; top: 32px; left: 0px">
+        <div class="p-1 bg-leather-600 border-2 border-leather-100 m-2 rounded-lg">
+          <div class="text-white font-bold pb-2 text-xl">login</div>
+          <div class="flex flex-col">
+            <div class="flex flex-row mt-1">
+            <div class="w-64 text-right bg-stone-700 pr-2 font-bold">username:</div>
+            <div class="w-64"><input bind:value={username} class="w-64 bg-white pl-2 text-amber-950"></div>
+          </div>
+          <div class="flex flex-row mt-1">
+            <div class="w-64 text-right bg-stone-700 pr-2 font-bold">password:</div>
+            <div class="w-64"><input id='username' bind:value={password} type="password" class="w-64 bg-white pl-2 text-amber-950"></div>
+          </div>
+          {#if canAuthenticate}
+            <div class="mt-1 font-bold">
+              <button class=" pl-2 pr-2 bg-garden-800" on:click={authenticateUser}>authenticate</button>
+            </div>
+          {/if}
+        </div>
+        </div>
+      </div>
+        {/if}
+      </div>
+    {/if}
+    <div  class="text-sm pt-1 ml-2 border border-amber-500 my-1 align-middle px-5"
+          style="position: relative; width: 70px;"
+    >
+      <div on:click={() => setMode('tools')} class="hover:bg-amber-100 hover:text-amber-800 cursor-pointer"
+           style="position: absolute; top: 0px; left: 0px; width: 70px;">
+        tools
+      </div>
+    </div>
     <div class="bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 cursor-pointer hover:bg-amber-400 hover:text-black relative">
       <div on:click={() => toggleOrgSelector()}>org</div>
       {#if orgSelector}
@@ -403,6 +536,28 @@
       {/if}
     </div>
 
+
+
+
+    <div class="relative mb-0 cursor-pointer">
+      <div on:click={togglePersonSelector} role="button" class="flex flex-row cursor-pointer">
+        <div class="cursor-pointer bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 h-7">
+          persons
+        </div>
+        {#if persons && persons.selected}
+          <div class="text-sm pt-1 pl-1">{persons.selected.last_name.toUpperCase()}, {persons.selected.first_name.toLowerCase()}</div>
+        {:else}
+          <div class="text-sm pt-1 pl-1">select a person...</div>
+        {/if}
+      </div>
+      {#if personSelector}
+        <div  class="bg-white border-2 border-garden-200 w-fit text-sm text-black"
+              style="position: absolute; left: 71px; top: 34px;">
+          <PersonSelector on:selectedPerson={onSelectPerson}></PersonSelector>
+        </div>
+      {/if}
+    </div>
+
 <!--                .___      .__           __                .__-->
 <!--    _____     __| _/_____ |__| ____   _/  |_  ____   ____ |  |   ______-->
 <!--    \__  \   / __ |/     \|  |/    \  \   __\/  _ \ /  _ \|  |  /  ___/-->
@@ -419,4 +574,16 @@
     </div>
     {/if}
   </div>
+  {#if persons.selected}
+    <div class="w-full text-left px-2"><b>person:</b> {persons.selected.last_name.toUpperCase()}, {persons.selected.first_name.toLowerCase()}</div>
+  {/if}
+  {#if mode === 'tools'}
+    <div class="border-b-2 border-garden-100 mb-4" style="width: calc(100% - 5px); position: relative">
+      &nbsp;
+      <div class="bg-garden-200 text-amber-100 px-4"
+           style="position: absolute; left: 10px; top: 12px"
+      >tools</div>
+    </div>
+    <Tools></Tools>
+  {/if}
 </main>

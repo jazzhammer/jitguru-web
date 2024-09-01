@@ -38,13 +38,24 @@
     if (security.loggedInUser) {
       fetch(`${API_BASE_URL}users/preference`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           user_id: security.loggedInUser.id,
           name: PREF_SELECTED_ORG_ID,
           value: org.id
         })
+      }).then((response) => {
+        if (response.status < 300) {
+          let pref = response.json();
+          console.log(`pref created : ${JSON.stringify(pref)}`);
+        }
+        throw new Error(`response status ${response.status}`);
+      }).catch( (e) => {
+        console.log(`while posting preference: ${e}`);
       });
-    }
+  }
     dispatch('selectedOrg', org);
   }
 
@@ -60,7 +71,7 @@
 
 </script>
 <main class="flex flex-col w-64 text-black text-left">
-  {#if orgs && orgs.assigned.length > 0}
+  {#if orgs && orgs.assigned && orgs.assigned.length > 0}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
       {#if mode!=='select_org'}
         <div on:click={()=>mode='select_org'} class="cursor-pointer rounded-xl bg-garden-400 hover:bg-garden-700 pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>

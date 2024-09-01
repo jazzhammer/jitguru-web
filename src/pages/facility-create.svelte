@@ -2,16 +2,29 @@
   import {API_BASE_URL} from "../settings/api-settings.js";
   import MessagesStore from "../stores/messages-store.js";
   import FacilitysStore from "../stores/facilitys-store.js";
-  import {createEventDispatcher} from "svelte";
+  import OrgStore from "../stores/orgs-store.js";
+
+  import {createEventDispatcher, onDestroy} from "svelte";
 
   let name;
   let description;
+  let org;
+  $: org
 
+  const unsubOrg = OrgStore.subscribe((next) => {
+    org = next['selected'];
+  });
+
+  onDestroy(unsubOrg);
 
   const dispatch = createEventDispatcher();
 
-  $: canCreate =  name && name.length > 0 &&
-                description && description.length > 0;
+  $: canCreate =  name &&
+                  name.length > 0 &&
+                  description &&
+                  description.length > 0 &&
+                  org;
+
   async function createFacility() {
     if (canCreate) {
       const response = await fetch(`${API_BASE_URL}facilitys?name=${name}`, {
@@ -19,7 +32,7 @@
       });
       debugger;
       const facilitysJson = await response.json();
-      if (facilitysJson.matched) {
+      if (facilitysJson.matched && facilitysJson.matched.length > 0) {
         MessagesStore.update(old => {
           return {
             ...old,
@@ -31,7 +44,8 @@
           method: "POST",
           body: JSON.stringify({
             name,
-            description
+            description,
+            org_id: org.id
           })
         });
         const createdJson = await createResponse.json();

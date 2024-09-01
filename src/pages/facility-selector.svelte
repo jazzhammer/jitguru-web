@@ -95,7 +95,8 @@
       {#if mode!=='join_facility'}
         <div on:click={()=>mode='join_facility'} class="cursor-pointer rounded-xl  bg-garden-400 hover:bg-garden-700 pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {:else}
-        <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
+        <div class="rounded-xl pt-2 mr-2"
+             style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='include_facility'}
         <div on:click={() => mode = 'join_facility'} class="cursor-pointer hover:text-garden-400">include a facility in this org:</div>
@@ -112,9 +113,11 @@
   {#if permissions['api.add_facility']}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
       {#if mode!=='create_facility'}
-        <div on:click={()=>mode='create_facility'} class="cursor-pointer rounded-xl  bg-garden-400 hover:bg-garden-700 pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
+        <div on:click={()=>mode='create_facility'} class="cursor-pointer rounded-xl  bg-garden-400 hover:bg-garden-700 pt-2 mr-2"
+             style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {:else}
-        <div class="rounded-xl pt-2 mr-2" style="margin-top: 6px; height: 4px; width: 8px;"></div>
+        <div class="rounded-xl pt-2 mr-2"
+             style="margin-top: 6px; height: 4px; width: 8px;"></div>
       {/if}
       {#if mode!=='create_facility'}
         <div on:click={() => mode = 'create_facility'} class="cursor-pointer hover:text-garden-400">create a facility:</div>
