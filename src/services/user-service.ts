@@ -3,7 +3,6 @@ import {type User} from "../models/user";
 
 const UserService = {
   authenticate: async (username: string, password: string): Promise<User> => {
-    debugger;
     const response = await fetch(
       `${API_BASE_URL}users`
       , {

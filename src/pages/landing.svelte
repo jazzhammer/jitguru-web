@@ -44,6 +44,7 @@
     matchPassword && validEmail();
 
   async function authenticateUser() {
+    // debugger;
     if (canAuthenticate) {
       let response = await fetch(
         `${API_BASE_URL}users`

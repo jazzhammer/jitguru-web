@@ -7,7 +7,7 @@
   import OrgsStore from "../stores/orgs-store.js";
   import UserGroupsStore from "../stores/user-groups-store.js";
   import UserPreferencesStore from '../stores/user-preferences-store.js';
-  import {PREF_SELECTED_ORG_ID} from '../models/user-preference.js';
+  import {PREF_SELECTED_ORG_ID, type UserPreference} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
   import OrgSelector from "./org-selector.svelte";
@@ -17,14 +17,32 @@
   import {navigate} from "svelte-routing";
   import store from "../stores/types.js";
   import {type Facility} from "../models/facility";
-
+  import MyTools from './my-tools.svelte';
   import Tools from './tools.svelte';
   import UserService from "../services/user-service";
   import {type User} from "../models/user";
+  import UserPreferenceService from "../services/user-preference-service";
+  import Tool from './tool.svelte';
 
+  let mode = '';
+  $: mode
+  const setMode = (next: string): void => {
+    mode = next;
+    loginMode = false;
+  }
+
+  let toolName;
+  $: toolName
   let preferences;
   const unsubPreferences = UserPreferencesStore.subscribe(stored => {
     preferences = stored;
+    if (preferences.type === store.READ && preferences.payload) {
+      const pref: UserPreference = preferences.payload;
+      if (pref.name.startsWith('tool:')) {
+        toolName = pref.name.split(':')[1];
+        mode='tool';
+      }
+    }
   });
 
   let permissions;
@@ -63,6 +81,7 @@
     persons = stored;
   });
 
+
   /**                                .__  __                          __
     ______ ____   ____  __ _________|__|/  |_ ___.__.   ______ _____/  |_ __ ________
    /  ___// __ \_/ ___\|  |  \_  __ \  \   __<   |  |  /  ___// __ \   __\  |  \____ \
@@ -91,6 +110,21 @@
    *
    * if after all that, there is a selected org,
    */
+  let userPreferenceTools;
+  $: userPreferenceTools
+  const refreshTools = (): void => {
+    if (security && security.loggedInUser) {
+      UserPreferenceService.find({
+        name: 'tool:',
+        user_id: security.loggedInUser.id
+      }).then((response) => {
+        // debugger;
+        userPreferenceTools = response.data.data;
+      })
+    }
+  }
+
+
   let security: {
     loggedInUser: User
   };
@@ -99,7 +133,7 @@
     security = stored as {
       loggedInUser: User
     };
-    console.log(`next security: ${JSON.stringify(security)}`)
+    // console.log(`next security: ${JSON.stringify(security)}`)
     if (security && security['loggedInUser']) {
       const user_id = security['loggedInUser']['id'];
       await setupPermissions(user_id);
@@ -107,6 +141,7 @@
       await setupUserOrgs(user_id);
 
     }
+    refreshTools();
   });
 
   onDestroy(()=>{
@@ -117,9 +152,16 @@
     unsubFacilitys();
     unsubMeetupSpots();
     unsubPersons();
+    unsubUserPreferences();
   });
 
-
+  let userPreferences;
+  $: userPreferences
+  const unsubUserPreferences = UserPreferencesStore.subscribe(async (stored) => {
+    userPreferences = stored;
+    refreshTools();
+  });
+  refreshTools();
   // ======================================================
   /**                           .__              .__
    ______   ___________  _____ |__| ______ _____|__| ____   ____   ______
@@ -394,14 +436,9 @@
   const setLoginMode = (next: boolean): void => {
     loginMode = next;
   }
-  let mode = '';
-  $: mode
-  const setMode = (next: string): void => {
-    mode = next;
-    loginMode = false;
-  }
 
-  let DEFAULT_USER_NAME = 'admin';
+
+  let DEFAULT_USER_NAME = 'jitguruadmin';
   let username = DEFAULT_USER_NAME;
   let password = '';
   let canAuthenticate = false;
@@ -416,6 +453,9 @@
     });
     loginMode = false;
   }
+
+
+
 </script>
 <main class="flex flex-col text-black m-0 h-full w-screen w-min-500">
   <div id="banner" class="h-7 bg-garden-200 text-white mr-1 flex flex-row">
@@ -577,13 +617,26 @@
   {#if persons.selected}
     <div class="w-full text-left px-2"><b>person:</b> {persons.selected.last_name.toUpperCase()}, {persons.selected.first_name.toLowerCase()}</div>
   {/if}
-  {#if mode === 'tools'}
-    <div class="border-b-2 border-garden-100 mb-4" style="width: calc(100% - 5px); position: relative">
-      &nbsp;
-      <div class="bg-garden-200 text-amber-100 px-4"
-           style="position: absolute; left: 10px; top: 12px"
-      >tools</div>
+  <div class="flex flex-row">
+    {#if userPreferenceTools && userPreferenceTools.length > 0}
+      <MyTools userPreferenceTools={userPreferenceTools}></MyTools>
+    {/if}
+    <div style="width: 100%;">
+      {#if mode === 'tools'}
+        <div class="border-b-2 border-garden-100 mb-4"
+             style="width: calc(100% - 5px); position: relative"
+        >
+          &nbsp;
+          <div class="bg-garden-200 text-amber-100 px-4"
+               style="position: absolute; left: 10px; top: 12px"
+          >tools</div>
+        </div>
+        <Tools></Tools>
+      {/if}
+      {#if mode === 'tool'}
+        <Tool toolName={toolName}></Tool>
+      {/if}
+
     </div>
-    <Tools></Tools>
-  {/if}
+  </div>
 </main>

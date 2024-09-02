@@ -1,6 +1,6 @@
 <script>
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_FACILITY_ID} from "../models/user-preference.js"
+  import {PREF_SELECTED_FACILITY_ID} from "../models/user-preference.ts"
   import {createEventDispatcher, onDestroy} from "svelte";
   import MeetupSpotsStore from "../stores/meetup_spots-store.js";
   import PermissionsStore from "../stores/permissions-store.js";

@@ -1,6 +1,6 @@
 <script>
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_ORG_ID} from "../models/user-preference.js"
+  import {PREF_SELECTED_ORG_ID} from "../models/user-preference.ts"
   import {createEventDispatcher} from "svelte";
   import OrgsStore, {ACTION_SELECTED} from "../stores/orgs-store.js";
   import {onDestroy} from "svelte";
