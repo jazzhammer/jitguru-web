@@ -4,7 +4,7 @@
   }
 </style>
 <script lang="ts">
-
+  import MeetupTemplates from './tools/meetup-templates.svelte';
 
   export let toolName;
   $: toolName
@@ -23,4 +23,7 @@
   <div class="bg-garden-200 text-amber-100 px-4"
        style="position: absolute; left: 10px; top: 12px"
   >{toolName}</div>
+  {#if toolName === 'meetup templates'}
+    <MeetupTemplates></MeetupTemplates>
+  {/if}
 </div>
