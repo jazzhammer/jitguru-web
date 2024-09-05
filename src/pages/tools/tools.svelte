@@ -2,6 +2,7 @@
   .tools {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
+    padding-top: 10px;
   }
 
   .tools > *  {
@@ -9,14 +10,15 @@
   }
 </style>
 <script lang="ts">
-  import UserPreferenceService from "../services/user-preference-service";
-  import {UserPreferenceValue} from "../models/user-preference";
-  import {type User} from "../models/user";
+  import UserPreferenceService from "../../services/user-preference-service";
+  import {UserPreferenceValue} from "../../models/user-preference";
+  import {type User} from "../../models/user";
   import {onDestroy} from "svelte";
-  import SecurityStore from '../stores/security-store';
-  import UserPreferencesStore from "../stores/user-preferences-store";
-  import store from "../stores/types";
-  import MeetupTemplatesCard from './tools/meetup-templates-card.svelte';
+  import SecurityStore from '../../stores/security-store';
+  import UserPreferencesStore from "../../stores/user-preferences-store";
+  import store from "../../stores/types";
+  import MeetupTemplatesCard from './meetup-template/meetup-templates-card.svelte';
+  import SubjectsCard from './subject/subjects-card.svelte';
 
   let security: {
     loggedInUser: User
@@ -48,6 +50,7 @@
   }
 </script>
 <div class="tools">
-  <MeetupTemplatesCard addToolToMe={addToolToMe}></MeetupTemplatesCard>
+  <div><MeetupTemplatesCard addToolToMe={addToolToMe}></MeetupTemplatesCard></div>
+  <div><SubjectsCard addToolToMe={addToolToMe}></SubjectsCard></div>
 </div>
 

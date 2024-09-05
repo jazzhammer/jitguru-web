@@ -1,5 +1,5 @@
 <script>
-  import AdminUsers from './admin/admin-users.svelte';
+  import AdminUsers from '../admin/admin-users.svelte';
   let mode = '';
   function setMode(next) {
     mode = next;

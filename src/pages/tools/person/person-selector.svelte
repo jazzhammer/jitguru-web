@@ -1,13 +1,13 @@
 <script lang="ts">
-  import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_FACILITY_ID} from "../models/user-preference.js"
+  import {API_BASE_URL} from "../../../settings/api-settings.js";
+  import {PREF_SELECTED_FACILITY_ID} from "../../../models/user-preference.js"
   import {createEventDispatcher, onDestroy} from "svelte";
-  import PermissionsStore from "../stores/permissions-store.js";
-  import SecurityStore from "../stores/security-store.js";
-  import PersonsStore from "../stores/persons-store.js";
+  import PermissionsStore from "../../../stores/permissions-store.js";
+  import SecurityStore from "../../../stores/security-store.js";
+  import PersonsStore from "../../../stores/persons-store.js";
   import PersonSearch from "./person-search.svelte";
   import PersonCreate from "./person-create.svelte";
-  import {type Person} from "../models/person";
+  import {type Person} from "../../../models/person";
 
   let mode = 'search_person';
 

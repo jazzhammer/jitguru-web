@@ -1,8 +1,8 @@
 <script>
-  import {API_BASE_URL} from "../settings/api-settings.js";
-  import MessagesStore from "../stores/messages-store.js";
-  import FacilitysStore from "../stores/facilitys-store.js";
-  import OrgStore from "../stores/orgs-store.js";
+  import {API_BASE_URL} from "../../../settings/api-settings.js";
+  import MessagesStore from "../../../stores/messages-store.js";
+  import FacilitysStore from "../../../stores/facilitys-store.js";
+  import OrgStore from "../../../stores/orgs-store.js";
 
   import {createEventDispatcher, onDestroy} from "svelte";
 

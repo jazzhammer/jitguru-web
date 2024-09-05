@@ -10,19 +10,19 @@
   import {PREF_SELECTED_ORG_ID, type UserPreference} from '../models/user-preference.js';
   import {onDestroy} from "svelte";
   import {API_BASE_URL} from "../settings/api-settings.js";
-  import OrgSelector from "./org-selector.svelte";
-  import MeetupSpotSelector from "./meetup-spot-selector.svelte";
-  import PersonSelector from "./person-selector.svelte";
-  import FacilitySelector from "./facility-selector.svelte";
+  import OrgSelector from "./tools/org/org-selector.svelte";
+  import MeetupSpotSelector from "./tools/meetup-spot/meetup-spot-selector.svelte";
+  import PersonSelector from "./tools/person/person-selector.svelte";
+  import FacilitySelector from "./tools/facility/facility-selector.svelte";
   import {navigate} from "svelte-routing";
   import store from "../stores/types.js";
   import {type Facility} from "../models/facility";
-  import MyTools from './my-tools.svelte';
-  import Tools from './tools.svelte';
+  import MyTools from './tools/my-tools.svelte';
+  import Tools from './tools/tools.svelte';
   import UserService from "../services/user-service";
   import {type User} from "../models/user";
   import UserPreferenceService from "../services/user-preference-service";
-  import Tool from './tool.svelte';
+  import Tool from './tools/tool.svelte';
 
   let mode = '';
   $: mode
@@ -212,13 +212,14 @@
     const response = await fetch(`${API_BASE_URL}users/preference?user_id=${user_id}`, {
       method: 'GET'
     });
+    debugger;
     const responseJson = await response.json();
-    const preferencesArrayJson = JSON.parse(responseJson);
-    const preferencesHash = preferencesArrayJson.reduce((acc, pref) => {
+    preferences = responseJson.data;
+
+    const preferencesHash = preferences.reduce((acc, pref) => {
       acc[pref.name] = pref.value;
       return acc;
     }, {});
-    // console.log(`preferences hash: ${JSON.stringify(preferencesHash)}`);
     UserPreferencesStore.update(old => {
       return preferencesHash
     });
@@ -621,22 +622,25 @@
     {#if userPreferenceTools && userPreferenceTools.length > 0}
       <MyTools userPreferenceTools={userPreferenceTools}></MyTools>
     {/if}
-    <div style="width: 100%;">
+    <div style="width: 100%; display: flex; flex-direction: column">
       {#if mode === 'tools'}
         <div class="border-b-2 border-garden-100 mb-4"
              style="width: calc(100% - 5px); position: relative"
         >
           &nbsp;
           <div class="bg-garden-200 text-amber-100 px-4"
-               style="position: absolute; left: 10px; top: 12px"
+               style="position: absolute; left: 10px; top: 12px;"
           >tools</div>
         </div>
-        <Tools></Tools>
+        <div style="">
+          <Tools></Tools>
+        </div>
       {/if}
       {#if mode === 'tool'}
-        <Tool toolName={toolName}></Tool>
+        <div>
+          <Tool toolName={toolName}></Tool>
+        </div>
       {/if}
-
     </div>
   </div>
 </main>

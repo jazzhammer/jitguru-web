@@ -1,11 +1,11 @@
 <script>
-  import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_ORG_ID} from "../models/user-preference.ts"
+  import {API_BASE_URL} from "../../../settings/api-settings.js";
+  import {PREF_SELECTED_ORG_ID} from "../../../models/user-preference.ts"
   import {createEventDispatcher} from "svelte";
-  import OrgsStore, {ACTION_SELECTED} from "../stores/orgs-store.js";
+  import OrgsStore, {ACTION_SELECTED} from "../../../stores/orgs-store.js";
   import {onDestroy} from "svelte";
-  import PermissionsStore from "../stores/permissions-store.js";
-  import SecurityStore from "../stores/security-store.js";
+  import PermissionsStore from "../../../stores/permissions-store.js";
+  import SecurityStore from "../../../stores/security-store.js";
   import OrgSearch from './org-search.svelte';
   import OrgCreate from './org-create.svelte';
 

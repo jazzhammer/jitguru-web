@@ -1,6 +1,6 @@
 <script>
   import { Router, Link, Route } from "svelte-routing";
-  import AdminTools from './pages/admin-tools.svelte';
+  import AdminTools from './pages/tools/admin-tools.svelte';
   import Home from './pages/home.svelte';
   import TailwindCss from './lib/TailwindCSS.svelte';
   import Landing from './pages/landing.svelte';

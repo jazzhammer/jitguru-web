@@ -1,9 +1,9 @@
 <script lang="ts">
-  import {API_BASE_URL} from "../settings/api-settings.js";
-  import MessagesStore from "../stores/messages-store.js";
-  import PersonsStore from "../stores/persons-store.js";
+  import {API_BASE_URL} from "../../../settings/api-settings.js";
+  import MessagesStore from "../../../stores/messages-store.js";
+  import PersonsStore from "../../../stores/persons-store.js";
   import {createEventDispatcher} from "svelte";
-  import {type Person} from "../models/person";
+  import {type Person} from "../../../models/person";
 
   export let createdPerson = (created: Person): void => {
     console.log(`createdPerson: ${JSON.stringify(created)}`);

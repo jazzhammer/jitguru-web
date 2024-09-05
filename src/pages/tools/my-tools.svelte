@@ -5,9 +5,9 @@
   }
 </style>
 <script lang="ts">
-  import {type UserPreference} from "../models/user-preference";
-  import UserPreferencesStore from "../stores/user-preferences-store";
-  import store from "../stores/types";
+  import {type UserPreference} from "../../models/user-preference";
+  import UserPreferencesStore from "../../stores/user-preferences-store";
+  import store from "../../stores/types";
 
   export let userPreferenceTools
   $: userPreferenceTools

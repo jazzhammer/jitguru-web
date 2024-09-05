@@ -11,8 +11,8 @@
   }
 </style>
 <script lang="ts">
-  import {type Person} from "../models/person";
-  import PersonService from "../services/person-service";
+  import {type Person} from "../../../models/person";
+  import PersonService from "../../../services/person-service";
 
   export let foundPersons = (next: Person[]): void => {
     console.log(`foundPersons(${JSON.stringify(next)})`);

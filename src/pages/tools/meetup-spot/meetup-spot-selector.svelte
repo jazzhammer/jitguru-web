@@ -1,10 +1,10 @@
 <script>
-  import {API_BASE_URL} from "../settings/api-settings.js";
-  import {PREF_SELECTED_FACILITY_ID} from "../models/user-preference.ts"
+  import {API_BASE_URL} from "../../../settings/api-settings.js";
+  import {PREF_SELECTED_FACILITY_ID} from "../../../models/user-preference.ts"
   import {createEventDispatcher, onDestroy} from "svelte";
-  import MeetupSpotsStore from "../stores/meetup_spots-store.js";
-  import PermissionsStore from "../stores/permissions-store.js";
-  import SecurityStore from "../stores/security-store.js";
+  import MeetupSpotsStore from "../../../stores/meetup_spots-store.js";
+  import PermissionsStore from "../../../stores/permissions-store.js";
+  import SecurityStore from "../../../stores/security-store.js";
   import MeetupSpotSearch from "./meetup-spot-search.svelte";
   import MeetupSpotCreate from "./meetup_spot-create.svelte";
 

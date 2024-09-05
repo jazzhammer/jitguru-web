@@ -18,9 +18,9 @@
 
 </style>
 <script lang="ts">
-  import {type User} from "../../models/user";
+  import {type User} from "../../../models/user";
   import {onDestroy} from "svelte";
-  import SecurityStore from '../../stores/security-store';
+  import SecurityStore from '../../../stores/security-store';
 
   export let addToolToMe = (next: string): void => {
     console.log(`function addToMe() not yet defined.`)
@@ -42,19 +42,18 @@
   <div class="tool-swatch border-2 border-amber-700 bg-amber-50 flex flex-col">
     <div class="tool-name bg-amber-900 text-amber-50 flex flex-row"
          style="height: 30px">
-      <div>meetup&nbsptemplates</div>
+      <div>subjects</div>
       <div style="width:100%"></div>
       {#if security && security.loggedInUser}
-        <div on:click={() => addToolToMe('meetup_templates')} class="hover:bg-amber-50 hover:text-amber-950 border-2 px-4 border-amber-50"
+        <div on:click={() => addToolToMe('subjects')} class="hover:bg-amber-50 hover:text-amber-950 border-2 px-4 border-amber-50"
              style="margin-bottom: 2px; border-radius: 2px; cursor: pointer;">
           add2me
         </div>
       {/if}
     </div>
-    <div class="tool-description text-blue-950">a description of what should happen in a meetup, including but not limited to:
-      <li>persons that are expected to attend,</li>
-      <li>their respective roles and </li>
-      <li>the meetup's expected outcomes</li>
+    <div class="tool-description text-blue-950">a broad area of study, such as:
+      <li>'calculus'</li>
+      <li>'tensors'</li>
     </div>
   </div>
 </div>
