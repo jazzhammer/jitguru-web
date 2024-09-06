@@ -30,7 +30,7 @@
       const response = await fetch(`${API_BASE_URL}facilitys?name=${name}`, {
         method: 'GET'
       });
-      debugger;
+      // debugger;
       const facilitysJson = await response.json();
       if (facilitysJson.matched && facilitysJson.matched.length > 0) {
         MessagesStore.update(old => {

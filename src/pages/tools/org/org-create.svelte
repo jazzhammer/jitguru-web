@@ -17,7 +17,7 @@
       const response = await fetch(`${API_BASE_URL}orgs?name=${name}`, {
         method: 'GET'
       });
-      debugger;
+      // debugger;
       const orgsJson = await response.json();
       if (orgsJson.matched) {
         MessagesStore.update(old => {

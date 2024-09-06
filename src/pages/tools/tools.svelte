@@ -19,6 +19,7 @@
   import store from "../../stores/types";
   import MeetupTemplatesCard from './meetup-template/meetup-templates-card.svelte';
   import SubjectsCard from './subject/subjects-card.svelte';
+  import CrewTemplatesCard from './crew-template/crew_templates-card.svelte';
 
   let security: {
     loggedInUser: User
@@ -52,5 +53,6 @@
 <div class="tools">
   <div><MeetupTemplatesCard addToolToMe={addToolToMe}></MeetupTemplatesCard></div>
   <div><SubjectsCard addToolToMe={addToolToMe}></SubjectsCard></div>
+  <div><CrewTemplatesCard addToolToMe={addToolToMe}></CrewTemplatesCard></div>
 </div>
 

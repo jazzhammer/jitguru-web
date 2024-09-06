@@ -6,7 +6,7 @@ import {type Topic} from "../models/topic";
 export interface TopicSearchDto {
   id?: number;
   name ?: string;
-  subject_id?: number;
+  crew_template_id?: number;
 }
 
 const TopicService = {

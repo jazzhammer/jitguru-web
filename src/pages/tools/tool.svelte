@@ -5,6 +5,7 @@
 
 </style>
 <script lang="ts">
+  import CrewTemplates from './crew-template/crew-templates.svelte';
   import MeetupTemplates from './meetup-template/meetup-templates.svelte';
   import Subjects from './subject/subjects.svelte';
 
@@ -28,7 +29,10 @@
     >{toolName}</div>
   </div>
   <div>
-    {#if toolName === 'meetup templates'}
+    {#if toolName === 'crew_templates'}
+      <CrewTemplates></CrewTemplates>
+    {/if}
+    {#if toolName === 'meetup_templates'}
       <MeetupTemplates></MeetupTemplates>
     {/if}
     {#if toolName === 'subjects'}

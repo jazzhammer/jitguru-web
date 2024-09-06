@@ -212,7 +212,7 @@
     const response = await fetch(`${API_BASE_URL}users/preference?user_id=${user_id}`, {
       method: 'GET'
     });
-    debugger;
+    // debugger;
     const responseJson = await response.json();
     preferences = responseJson.data;
 
