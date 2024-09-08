@@ -39,6 +39,8 @@ import SearchCrewTemplate from './../crew-template/search-crew-template.svelte';
 import ListCrewTemplates from './../crew-template/list-crew-templates.svelte';
 import SearchMeetupSpot from './../meetup-spot/search-meetup-spot.svelte';
 import ListMeetupSpots from './../meetup-spot/list-meetup-spots.svelte';
+import SearchFacility from './../facility/search-facility.svelte';
+import ListFacilitys from './../facility/list-facilitys.svelte';
 import MessagesStore from './../../../stores/messages-store';
 export let editableMeetupTemplate: MeetupTemplate;
 $: editableMeetupTemplate
@@ -290,6 +292,24 @@ const selectNextCrewTemplate = (next: CrewTemplate): void => {
 }
 
 
+let facilitys: Facility[];
+$: facilitys
+const foundFacilitys = (next: Facility[]): void => {
+  facilitys = next;
+}
+
+const selectNextFacility = (next: Facility): void => {
+  nextMeetupTemplate.facility_id = next.id
+  facility = next;
+  setEditing(null);
+  update();
+  MessagesStore.set({
+    type: 'edit-meetup-template',
+    message: `updated meetup_template with facility ${facility.name}`
+  });
+}
+
+
 
 let message = ''
 $: message
@@ -331,9 +351,10 @@ onDestroy(unsubMessage);
          style="position: relative"
     ><div on:click={() => setEditing('facility')}>{facility?.name}</div>
     {#if editing === 'facility'}
-      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px"
-           class="border-2 border:black bg-garden-100">
-        &nbsp;asdfasdf
+      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px; z-index: 1000;"
+           class="border-2 border-amber-700 bg-white rounded-sm">
+        <SearchFacility found={foundFacilitys}></SearchFacility>
+        <ListFacilitys selected={selectNextFacility} facilitys={facilitys}></ListFacilitys>
       </div>
     {/if}
     </div>
