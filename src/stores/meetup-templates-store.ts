@@ -1,11 +1,11 @@
 import { writable } from 'svelte/store';
 import store from "./types";
-export interface SubjectsCrud {
+export interface MeetupTemplatesCrud {
   type: string;
   payload: any;
 }
-const SubjectsStore = writable<SubjectsCrud>({
+const MeetupTemplatesStore = writable<MeetupTemplatesCrud>({
   type: store.CREATE,
   payload: null
 });
-export default SubjectsStore;
+export default MeetupTemplatesStore;

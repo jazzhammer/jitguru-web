@@ -3,7 +3,7 @@
 
   }
   .search-input {
-    width: 100%;
+    width: 100px;
     height: 20px;
     font-size: 12pt;
     padding-left: 3px;
@@ -45,8 +45,11 @@
   $: search
 
 </script>
-<main class="person-search border-3 border-yellow-900 bg-white">
+<main class="person-search border-3 border-yellow-900">
   <div>
-    <input on:keyup={keyupSearch} bind:value={search} class="search-input" placeholder="search for..."/>
+    <input on:keyup={keyupSearch}
+           bind:value={search}
+           class="search-input"
+           placeholder="search for..."/>
   </div>
 </main>

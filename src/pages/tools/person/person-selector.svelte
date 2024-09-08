@@ -9,7 +9,7 @@
   import PersonCreate from "./person-create.svelte";
   import {type Person} from "../../../models/person";
 
-  let mode = 'search_person';
+  let mode = '';
 
   let permissions;
   const unsubPermissions = PermissionsStore.subscribe(stored => {
@@ -18,7 +18,7 @@
 
   const dispatch = createEventDispatcher();
 
-  let persons;
+  export let persons;
   $: persons
   const unsubPersons = PersonsStore.subscribe(stored => {
     persons = stored;
@@ -43,8 +43,7 @@
     security = old;
   });
 
-  const selectPerson = (person: Person) => {
-
+  export let selectPerson = (person: Person) => {
     PersonsStore.update(old => {
       return {
         ...old,
@@ -87,25 +86,22 @@
 </script>
 <main class="flex flex-col w-64 text-black text-left">
   <div>
-    {#if mode === 'search_person'}
-      <PersonSearch foundPersons={foundPersons}></PersonSearch>
-      <div on:click={()=>{setMode('new_person')}}
-           class="cursor-pointer hover:underline border border-amber-700 px-2"
-      >new person...</div>
-      {#if persons.persons?.length > 0}
-        {#each persons.persons as person}
-          <div on:click={selectPerson(person)} class="px-2 hover:bg-blue-300 hover:text-amber-950">
-            {person.last_name.toUpperCase()}, {person.first_name.toLowerCase()}
-          </div>
-        {/each}
-      {/if}
-    {/if}
-    {#if mode === 'new_person'}
-      <PersonCreate createdPerson={createdPerson}></PersonCreate>
-      <div on:click={()=>{setMode('search_person')}}
-           class="cursor-pointer hover:underline border border-amber-700"
-      >search person...</div>
-    {/if}
+    <!--{#if mode === 'search_person'}-->
+    <!--  <PersonSearch foundPersons={foundPersons}></PersonSearch>-->
+    <!--  {#if persons.persons?.length > 0}-->
+    <!--    {#each persons.persons as person}-->
+    <!--      <div on:click={selectPerson(person)} class="px-2 hover:bg-blue-300 hover:text-amber-950">-->
+    <!--        {person.last_name.toUpperCase()}, {person.first_name.toLowerCase()}-->
+    <!--      </div>-->
+    <!--    {/each}-->
+    <!--  {/if}-->
+    <!--{/if}-->
+    <!--{#if mode === 'new_person'}-->
+    <!--  <PersonCreate createdPerson={createdPerson}></PersonCreate>-->
+    <!--  <div on:click={()=>{setMode('search_person')}}-->
+    <!--       class="cursor-pointer hover:underline border border-amber-700"-->
+    <!--  >search person...</div>-->
+    <!--{/if}-->
   </div>
   {#if persons && persons.persons?.length > 0}
     <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">
@@ -120,16 +116,17 @@
       <!--  <div class="">go to another person:</div>-->
       <!--{/if}-->
     </div>
-    {#if mode==='select_person'}
-      {#each persons.persons as person}
-        {#if !persons.selected || person.id !== persons.selected.id}
+    <!--{#if mode==='select_person'}-->
+      {#each persons as person}
           <div class="flex flex-row">
-            <div on:click={() => selectPerson(person)} class="pl-2 w-11/12 bg-{persons.selected?.id === person.id ? 'garden-800':'white'} hover:bg-garden-900 cursor-pointer">{person.name}</div>
+            <div on:click={() => selectPerson(person)}
+                 class="pl-2 w-11/12 bg-{persons.selected?.id === person.id ? 'garden-800':'white'} hover:bg-garden-900 cursor-pointer">
+              {person.name}
+            </div>
             <div class="w-2 pl-2 pr-3 cursor-pointer hover:bg-cocoa-200 hover:text-white font-bold">-</div>
           </div>
-        {/if}
       {/each}
-    {/if}
+    <!--{/if}-->
   {/if}
   <!--{#if permissions.add_facility_person}-->
   <!--  <div class="pl-2 italic border-b-2 bg-stone-800 font-bold border-garden-200 flex flex-row">-->

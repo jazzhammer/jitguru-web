@@ -69,7 +69,7 @@
   }
 
 </script>
-<div class="tool">
+<div class="crew-templates">
   <div class="menu ml-3">
     {#if mode !== 'new'}
       <div on:click={() => setMode('new')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"

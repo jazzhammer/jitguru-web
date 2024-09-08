@@ -56,7 +56,7 @@ const keyupTopicName = (e: KeyboardEvent): void => {
   </div>
   {#if canCreate}
   <div on:click={create}
-      class="bg-amber-700 text-amber-100 text-center hover:bg-blue-300 hover:text-blue-950"
+      class="bg-amber-700 text-amber-100 text-center hover:bg-blue-300 hover:text-blue-950 cursor-pointer"
       style="border-radius: 3px; min-width: 90px; max-width: 150px; margin-top:12px;"
   >create topic</div>
   {/if}

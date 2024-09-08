@@ -1,5 +1,5 @@
 <style>
-  .crew-templates {
+  .persons {
     width: 100%;
     text-align: left;
   }
@@ -15,12 +15,12 @@
 </style>
 <script lang="ts">
   import store from "../../../stores/types";
-  import {type CrewTemplate} from "../../../models/crew-template";
-  import CrewTemplatesStore from "../../../stores/crew-templates-store";
-  import NewCrewTemplate from './new-crew-template.svelte';
-  import SearchCrewTemplate from './search-crew-template.svelte';
-  import ListCrewTemplates from './list-crew-templates.svelte';
-  import EditCrewTemplate from './edit-crew-template.svelte';
+  import {type Person} from "../../../models/person";
+  import PersonsStore from "../../../stores/persons-store";
+  import NewPerson from './person-create.svelte'
+  import SearchPerson from './person-search.svelte';
+  import ListPersons from './list-persons.svelte';
+  // import EditPerson from './edit-person.svelte';
 
   let mode = 'search';
   $: mode
@@ -28,10 +28,10 @@
     mode = next;
   }
 
-  let crewTemplate: CrewTemplate;
-  $: crewTemplate
-  const createdCrewTemplate = (next: CrewTemplate): void => {
-    crewTemplate = next;
+  let person: Person;
+  $: person
+  const createdPerson = (next: Person): void => {
+    person = next;
     mode = 'search';
   }
 
@@ -49,27 +49,28 @@
     }, 400);
   }
 
-  let crewTemplates;
-  $: crewTemplates
-  const found = (founds: CrewTemplate[]): void => {
-    crewTemplates = founds;
+  let persons;
+  $: persons
+  const found = (founds: Person[]): void => {
+    console.log(`found patients : ${founds?.length}`)
+    persons = founds;
   }
 
-  const selectedCrewTemplate = (next: CrewTemplate): void => {
-    crewTemplate = next;
+  const selectedPerson = (next: Person): void => {
+    person = next;
     mode = 'edit';
-    CrewTemplatesStore.set({
+    PersonsStore.set({
       type: store.READ,
-      payload: crewTemplate
+      payload: person
     });
   }
 
-  const updatedCrewTemplate = (next: CrewTemplate) => {
-    crewTemplate = next;
+  const updatedPerson = (next: Person) => {
+    person = next;
   }
 
 </script>
-<div class="crew-templates">
+<div class="persons">
   <div class="menu ml-3">
     {#if mode !== 'new'}
       <div on:click={() => setMode('new')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"
@@ -88,16 +89,16 @@
   </div>
   <div class="ml-3 mt-3">
     {#if mode === 'new'}
-      <NewCrewTemplate createdCrewTemplate="{createdCrewTemplate}"></NewCrewTemplate>
+      <NewPerson createdPerson="{createdPerson}"></NewPerson>
     {/if}
     {#if mode === 'search'}
-      <SearchCrewTemplate found="{found}"></SearchCrewTemplate>
-      {#if crewTemplates && crewTemplates.length > 0}
-        <ListCrewTemplates crewTemplates={crewTemplates} selected={selectedCrewTemplate}></ListCrewTemplates>
+      <SearchPerson foundPersons="{found}"></SearchPerson>
+      {#if persons && persons.length > 0}
+        <ListPersons persons={persons} selectPerson={selectedPerson}></ListPersons>
       {/if}
     {/if}
-    {#if mode === 'edit'}
-      <EditCrewTemplate updatedCrewTemplate="{updatedCrewTemplate}"></EditCrewTemplate>
-    {/if}
+    <!--{#if mode === 'edit'}-->
+    <!--  <EditPerson updatedPerson="{updatedPerson}"></EditPerson>-->
+    <!--{/if}-->
   </div>
 </div>

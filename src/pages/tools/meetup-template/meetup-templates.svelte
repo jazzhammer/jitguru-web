@@ -14,12 +14,12 @@
   }
 </style>
 <script lang="ts">
-  // import NewSubject from './new-subject.svelte';
-  // import SearchSubject from './search-subject.svelte';
-  // import ListSubjects from './list-subjects.svelte';
-  // import EditSubject from './edit-subject.svelte';
-  import {type Subject} from "../../../models/subject";
-  import SubjectsStore from "../../../stores/subjects-store";
+  import NewMeetupTemplate from './new-meetup-template.svelte';
+  import SearchMeetupTemplate from './search-meetup-template.svelte';
+  import ListMeetupTemplates from './list-meetup-templates.svelte';
+  import EditMeetupTemplate from './edit-meetup-template.svelte';
+  import {type MeetupTemplate} from "../../../models/meetup-template";
+  import MeetupTemplatesStore from "../../../stores/meetup-templates-store";
   import store from "../../../stores/types";
   let mode = 'search';
   $: mode
@@ -27,10 +27,10 @@
     mode = next;
   }
 
-  let subject: Subject;
-  $: subject
-  const createdSubject = (next: Subject): void => {
-    subject = next;
+  let meetupTemplate: MeetupTemplate;
+  $: meetupTemplate
+  const createdMeetupTemplate = (next: MeetupTemplate): void => {
+    meetupTemplate = next;
     mode = 'search';
   }
 
@@ -48,23 +48,26 @@
     }, 400);
   }
 
-  let subjects;
-  $: subjects
-  const found = (founds: Subject[]): void => {
-    subjects = founds;
+  let meetupTemplates;
+  $: meetupTemplates
+  const found = (founds: MeetupTemplate[]): void => {
+    meetupTemplates = founds;
   }
 
-  const selectedSubject = (next: Subject): void => {
-    subject = next;
+  let editableMeetupTemplate: MeetupTemplate;
+  $: editableMeetupTemplate
+  const selectedMeetupTemplate = (next: MeetupTemplate): void => {
+    meetupTemplate = next;
     mode = 'edit';
-    SubjectsStore.set({
+    editableMeetupTemplate = next;
+    MeetupTemplatesStore.set({
       type: store.READ,
-      payload: subject
+      payload: meetupTemplate
     });
   }
 
-  const updatedSubject = (next: Subject) => {
-    subject = next;
+  const updatedMeetupTemplate = (next: MeetupTemplate) => {
+    meetupTemplate = next;
   }
 
 </script>
@@ -86,17 +89,17 @@
     {/if}
   </div>
   <div class="ml-3 mt-3">
-    <!--{#if mode === 'new'}-->
-    <!--  <NewSubject createdSubject="{createdSubject}"></NewSubject>-->
-    <!--{/if}-->
-    <!--{#if mode === 'search'}-->
-    <!--  <SearchSubject found="{found}"></SearchSubject>-->
-    <!--  {#if subjects && subjects.length > 0}-->
-    <!--    <ListSubjects subjects={subjects} selected={selectedSubject}></ListSubjects>-->
-    <!--  {/if}-->
-    <!--{/if}-->
-    <!--{#if mode === 'edit'}-->
-    <!--  <EditSubject updatedSubject="{updatedSubject}"></EditSubject>-->
-    <!--{/if}-->
+    {#if mode === 'new'}
+      <NewMeetupTemplate createdMeetupTemplate="{createdMeetupTemplate}"></NewMeetupTemplate>
+    {/if}
+    {#if mode === 'search'}
+      <SearchMeetupTemplate found="{found}"></SearchMeetupTemplate>
+      {#if meetupTemplates && meetupTemplates.length > 0}
+        <ListMeetupTemplates meetupTemplates={meetupTemplates} selected={selectedMeetupTemplate}></ListMeetupTemplates>
+      {/if}
+    {/if}
+    {#if mode === 'edit'}
+      <EditMeetupTemplate editableMeetupTemplate="{editableMeetupTemplate}"></EditMeetupTemplate>
+    {/if}
   </div>
 </div>

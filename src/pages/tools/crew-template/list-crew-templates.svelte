@@ -1,6 +1,6 @@
 <style>
   .list-crew-templates {
-    width: 200px;
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr;
     margin-left: 0px;
@@ -24,7 +24,7 @@
 </script>
 <div class="list-crew-templates">
   {#if crewTemplates && crewTemplates.length}
-    <div class="text-center bg-white">name</div>
+    <div class="text-center bg-amber-100 w-full">name</div>
     {#each crewTemplates as crewTemplate}
       <div on:click={() => selected(crewTemplate)} class="item hover:bg-blue-200 cursor-pointer text-left">{crewTemplate.name}</div>
     {/each}

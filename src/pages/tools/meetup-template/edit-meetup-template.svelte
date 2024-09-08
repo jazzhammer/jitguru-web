@@ -1,5 +1,5 @@
 <style>
-  .edit-subject {
+  .edit-meetup-template {
     width: 100%;
     text-align: left;
   }
@@ -17,60 +17,199 @@
   }
 </style>
 <script lang="ts">
-import SubjectsStore from '../../../stores/subjects-store';
+import MeetupTemplatesStore from '../../../stores/meetup-templates-store';
 import store from '../../../stores/types';
-import {type Subject} from '../../../models/subject';
-import SubjectService from '../../../services/subject-service';
-import ListTopics from './list-topics.svelte';
+import {type MeetupTemplate} from '../../../models/meetup-template';
+import MeetupTemplateService from '../../../services/meetup-template-service';
+import OrgsStore from './../../../stores/orgs-store';
+import {type Org} from '../../../models/org';
 import {type Topic} from '../../../models/topic';
 import TopicsStore from '../../../stores/topics-store';
 import {onDestroy} from "svelte";
 import TopicService from "../../../services/topic-service";
-import NewTopic from './new-topic.svelte';
-import EditTopic from './edit-topic.svelte';
+import {type Facility} from "../../../models/facility";
+import FacilityService from "../../../services/facility-service";
+import {type MeetupSpot} from "../../../models/meetup_spot";
+import MeetupSpotService from "../../../services/meetup-spot-service";
+import {type CrewTemplate} from "../../../models/crew-template";
+import CrewTemplateService from "../../../services/crew-template-service";
+import {type Subject} from "../../../models/subject";
+import SubjectService from "../../../services/subject-service";
+import SearchCrewTemplate from './../crew-template/search-crew-template.svelte';
+import ListCrewTemplates from './../crew-template/list-crew-templates.svelte';
+import SearchMeetupSpot from './../meetup-spot/search-meetup-spot.svelte';
+import ListMeetupSpots from './../meetup-spot/list-meetup-spots.svelte';
+import MessagesStore from './../../../stores/messages-store';
+export let editableMeetupTemplate: MeetupTemplate;
+$: editableMeetupTemplate
 
-let nextSubject: Partial<Subject> = {
-  name: ''
-};
+let facility: Facility;
+$: facility
+
+let meetup_spot: MeetupSpot;
+$: meetup_spot
+
+let crew_template: CrewTemplate;
+$: crew_template
 
 let subject: Subject;
 $: subject
 
-export let updatedSubject = (updated: Subject): void => {
-  console.log(`updated ${JSON.stringify(updated)}`);
-};
-let canUpdate = false;
-$: canUpdate = nextSubject.name && nextSubject.name.trim().length > 0;
-
-const update = (): void => {
-  SubjectService.update({
-    ...nextSubject
-  }).then((response) => {
-    const updated = response.data.updated;
-    SubjectsStore.set({
-      type: store.UPDATE,
-      payload: updated
-    });
-    updatedSubject(updated);
-    subject = updated;
-  });
-}
 let mode = 'new';
 const setMode = (next: string): void => {
   mode = next;
 }
 let topic: Topic;
 $: topic
-const selectedTopic = (next: Topic): void => {
-  topic = next;
-  setMode('edit');
-  TopicsStore.set({
-    type: store.READ,
-    payload: next
-  });
+
+let topics: Topic[]
+$: topics
+
+
+const subjectForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise<Subject> => {
+  if (meetupTemplate) {
+    if (meetupTemplate.subject) {
+      const response = await SubjectService.find({
+        id: meetupTemplate.subject
+      });
+      const subject = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+      return subject;
+    }
+    return null;
+  }
+  return null;
 }
 
-const refreshTopics = (subject: Subject): void => {
+const crewTemplateForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise<CrewTemplate> => {
+  if (meetupTemplate) {
+    if (meetupTemplate.crew_template) {
+      const response = await CrewTemplateService.find({
+        id: meetupTemplate.crew_template
+      });
+      const crewTemplate = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+      return crewTemplate;
+    }
+    return null;
+  }
+  return null;
+}
+
+const facilityForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise<Facility> => {
+  if (meetupTemplate) {
+    if (meetupTemplate.facility) {
+      const response = await FacilityService.find({
+        id: meetupTemplate.facility
+      });
+      const facility = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+      return facility;
+    }
+    return null;
+  }
+  return null;
+}
+
+const meetupSpotForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise<MeetupSpot> => {
+  if (meetupTemplate) {
+    if (meetupTemplate.meetup_spot) {
+      const response = await MeetupSpotService.find({
+        id: meetupTemplate.meetup_spot
+      });
+      const meetupSpot = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+      return meetupSpot;
+    }
+    return null;
+  }
+  return null;
+}
+
+facilityForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
+  facility = found;
+});
+
+meetupSpotForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
+  meetup_spot = found;
+});
+
+crewTemplateForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
+  crew_template = found;
+});
+
+subjectForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
+  subject = found;
+});
+
+if (editableMeetupTemplate) {
+  if (editableMeetupTemplate.meetup_spot) {
+    MeetupSpotService.find({
+      id: editableMeetupTemplate.meetup_spot
+    }).then((response) => {
+      meetup_spot = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+    });
+  }
+}
+
+let nextMeetupTemplate: Partial<MeetupTemplate> = {
+  id: editableMeetupTemplate?.id,
+  name: editableMeetupTemplate?.name,
+  work_in_progress: editableMeetupTemplate?.work_in_progress
+};
+let org: Org;
+$: org
+
+const unsubOrg = OrgsStore.subscribe((crud: any) => {
+  if (crud && crud.type == store.READ) {
+    org = crud.payload;
+    // console.log(`org payload: ${org?.name}`)
+  }
+  else if (crud && crud.selected) {
+    org = crud.selected;
+    editableMeetupTemplate.org_id = org.id;
+    // console.log(`org selected: ${org?.name}`)
+  }
+  else {
+    // console.log(`org store: ${JSON.stringify(crud)}`)
+  }
+});
+
+export let updatedMeetupTemplate = (updated: MeetupTemplate): void => {
+  console.log(`updated ${JSON.stringify(updated)}`);
+};
+let canUpdate = false;
+$: canUpdate = nextMeetupTemplate.name && nextMeetupTemplate.name.trim().length > 0;
+
+const update = (): void => {
+  MeetupTemplateService.update({
+    ...nextMeetupTemplate
+  }).then((response) => {
+    const updated = response.data.updated;
+    MeetupTemplatesStore.set({
+      type: store.UPDATE,
+      payload: updated
+    });
+    updatedMeetupTemplate(updated);
+    nextMeetupTemplate = updated;
+  });
+}
+// const selectedTopic = (next: Topic): void => {
+//   topic = next;
+//   setMode('edit');
+//   TopicsStore.set({
+//     type: store.READ,
+//     payload: next
+//   });
+// }
+
+const refreshTopics = (subject: MeetupTemplate): void => {
   if (subject) {
     TopicService.find({
       subject_id: subject.id
@@ -81,67 +220,202 @@ const refreshTopics = (subject: Subject): void => {
 
 }
 
-let topics: Topic[]
-$: topics
-let unsubSubject = SubjectsStore.subscribe((scrud) => {
+let unsubMeetupTemplate = MeetupTemplatesStore.subscribe((scrud) => {
   if (scrud.type == store.READ) {
-    nextSubject = scrud.payload;
-    subject = scrud.payload;
-    refreshTopics(subject);
+    nextMeetupTemplate = scrud.payload;
+    const meetupTemplate = scrud.payload;
+    refreshTopics(meetupTemplate);
   }
 });
-onDestroy(unsubSubject);
+onDestroy(unsubMeetupTemplate);
 
 
 
-const createdTopic =(next: Topic): void => {
-  TopicsStore.set({
-    type: store.CREATE,
-    payload: next
-  });
-  refreshTopics(subject);
+// const createdTopic =(next: Topic): void => {
+//   TopicsStore.set({
+//     type: store.CREATE,
+//     payload: next
+//   });
+//   refreshTopics(subject);
+// }
+// const updatedTopic = (next: Topic): void => {
+//   TopicsStore.set({
+//     type: store.UPDATE,
+//     payload: next
+//   });
+//   refreshTopics(subject);
+// }
+let editing = '';
+$: editing
+const setEditing = (next: string): void => {
+  if (next === editing) {
+    editing = null;
+  } else {
+    editing = next;
+  }
 }
-const updatedTopic = (next: Topic): void => {
-  TopicsStore.set({
-    type: store.UPDATE,
-    payload: next
-  });
-  refreshTopics(subject);
+
+let meetupSpots: MeetupSpot[];
+$: meetupSpots
+const foundMeetupSpots = (next: MeetupSpot[]): void => {
+  meetupSpots = next;
 }
+
+const selectNextMeetupSpot = (next: MeetupSpot): void => {
+  nextMeetupTemplate.crew_template_id = next.id
+  meetup_spot = next;
+  setEditing(null);
+  update();
+  MessagesStore.set({
+    type: 'edit-meetup-template',
+    message: `updated meetup_template with meetup_spot ${meetup_spot.name}`
+  });
+}
+
+let crewTemplates: CrewTemplate[];
+$: crewTemplates
+const foundCrewTemplates = (next: CrewTemplate[]): void => {
+  crewTemplates = next;
+}
+
+const selectNextCrewTemplate = (next: CrewTemplate): void => {
+  nextMeetupTemplate.crew_template_id = next.id
+  crew_template = next;
+  setEditing(null);
+  update();
+  MessagesStore.set({
+    type: 'edit-meetup-template',
+    message: `updated meetup_template with crew_template ${crew_template.name}`
+  });
+}
+
+
+
+let message = ''
+$: message
+const unsubMessage = MessagesStore.subscribe((crud: any) => {
+  if (crud && crud.type === 'edit-meetup-template') {
+    message = crud.message;
+    setTimeout(
+      () => {message = ''},
+      4000
+    );
+  }
+});
+onDestroy(unsubMessage);
 
 </script>
-<div class="edit-subject flex flex-col">
-  <div class="bg-amber-100 text-amber-950 px-2">subject details: <b>{nextSubject.name}</b></div>
-  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 300px; padding-left: 8px; margin-top: 8px;">
-    <div>name</div>
-    <div><input bind:value={nextSubject.name}
-                placeholder="name"
-                class="bg-white text-amber-950 pl-3"/>
+<div class="edit-meetup-template flex flex-col">
+  <div class="bg-amber-100 text-amber-950 px-2 flex flex-row">
+    <div>meetup_template details: <b>{nextMeetupTemplate.name}[{nextMeetupTemplate.id}]</b></div>
+    <div class="ml-4">work_in_progress = <b>{nextMeetupTemplate.work_in_progress}</b></div>
+    <div class="ml-4" style="style: italic;">{message}</div>
+  </div>
+  <!--  edit org-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>org</div>
+    <div class="pl-2 hover:text-blue-950 hover:bg-blue-200 cursor-pointer"
+         style="position: relative"
+    ><div on:click={() => setEditing('org')}>{org?.name}</div>
+      {#if editing === 'org'}
+        <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px"
+             class="border-2 border:black bg-garden-100">
+        </div>
+      {/if}
     </div>
   </div>
+  <!--  edit facility-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>facility</div>
+    <div class="pl-2 hover:text-blue-950 hover:bg-blue-200 cursor-pointer"
+         style="position: relative"
+    ><div on:click={() => setEditing('facility')}>{facility?.name}</div>
+    {#if editing === 'facility'}
+      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px"
+           class="border-2 border:black bg-garden-100">
+        &nbsp;asdfasdf
+      </div>
+    {/if}
+    </div>
+  </div>
+  <!--  edit meetup_spot-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>meetup_spot</div>
+    <div class="pl-2 hover:text-blue-950 hover:bg-blue-200 cursor-pointer"
+         style="position: relative"
+    ><div on:click={() => setEditing('meetup_spot')}>{meetup_spot?.name}</div>
+    {#if editing === 'meetup_spot'}
+      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px; z-index: 1000;"
+           class="border-2 border-amber-700 bg-white rounded-sm">
+        <SearchMeetupSpot found={foundMeetupSpots}></SearchMeetupSpot>
+        <ListMeetupSpots selected={selectNextMeetupSpot} meetupSpots={meetupSpots}></ListMeetupSpots>
+      </div>
+    {/if}
+    </div>
+  </div>
+  <!--  edit crew_template-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>crew_template&nbsp;{nextMeetupTemplate.crew_template ? `[${nextMeetupTemplate.crew_template}]` : ''}</div>
+    <div class="pl-2 hover:text-blue-950 hover:bg-blue-200 cursor-pointer"
+         style="position: relative"
+
+    ><div on:click={() => setEditing('crew_template')}>{crew_template?.name}</div>
+    {#if editing === 'crew_template'}
+      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px; z-index: 1000;"
+           class="border-2 border-amber-700 bg-white rounded-sm">
+        <SearchCrewTemplate found={foundCrewTemplates}></SearchCrewTemplate>
+        <ListCrewTemplates selected={selectNextCrewTemplate} crewTemplates={crewTemplates}></ListCrewTemplates>
+      </div>
+    {/if}
+    </div>
+  </div>
+  <!--  edit subject-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>subject&nbsp;{nextMeetupTemplate.subject ? `[${nextMeetupTemplate.subject}]` : ''}</div>
+    <div class="pl-2 hover:text-blue-950 hover:bg-blue-200 cursor-pointer"
+         style="position: relative"
+    ><div on:click={() => setEditing('subject')}>{subject?.name}</div>
+    {#if editing === 'subject'}
+      <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px"
+           class="border-2 border:black bg-garden-100">
+        &nbsp;asdfasdf
+      </div>
+    {/if}
+    </div>
+  </div>
+  <!--  edit name-->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 450px; padding-left: 8px; margin-top: 8px;">
+    <div>name</div>
+    <div><input bind:value={nextMeetupTemplate.name}
+                placeholder="name"
+                class="bg-white text-amber-950 pl-3 ml-1 "/>
+    </div>
+  </div>
+
   {#if canUpdate}
   <div on:click={update}
       class="bg-amber-700 text-amber-100 text-center hover:bg-blue-300 hover:text-blue-950"
-      style="border-radius: 3px; min-width: 90px; max-width: 150px; margin-top:12px;"
-  >update subject</div>
+      style="border-radius: 3px; min-width: 90px; max-width: 250px; margin-top:12px;"
+  >update meetup_template</div>
   {/if}
-  <div class="tool text-amber-950 text-left flex flex-col mb-10" style="position: relative;">
-    <div class="border-b-2 border-garden-100 mb-4"
-         style="width: calc(100% - 5px); position: absolute; top: 0px; left: -8px;"
-    >
-      <!--    <div class="border-garden-100"-->
-      <!--         style="width: 100%; position: absolute; top: 10px; left: 0px; border-bottom: 1px solid">-->
-            &nbsp;
-      <!--    </div>&nbsp;-->
+  {#if subject}
+    <div class="tool text-amber-950 text-left flex flex-col mb-10" style="position: relative;">
+      <div class="border-b-2 border-garden-100 mb-4"
+           style="width: calc(100% - 5px); position: absolute; top: 0px; left: -8px;"
+      >
+        <!--    <div class="border-garden-100"-->
+        <!--         style="width: 100%; position: absolute; top: 10px; left: 0px; border-bottom: 1px solid">-->
+              &nbsp;
+        <!--    </div>&nbsp;-->
 
+      </div>
+      <div class="bg-garden-200 text-amber-100 px-4"
+           style="position: absolute; left: 2px; top: 12px"
+      >
+        topics for {subject.name}
+      </div>
     </div>
-    <div class="bg-garden-200 text-amber-100 px-4"
-         style="position: absolute; left: 2px; top: 12px"
-    >
-      topics for {subject.name}
-    </div>
-  </div>
-
+  {/if}
   <div class="">
       <div class="menu ml-2">
         {#if mode !== 'new'}
@@ -155,18 +429,18 @@ const updatedTopic = (next: Topic): void => {
       <div class="topics-panel mt-3">
         <div class="">
           {#if mode === 'new'}
-            <NewTopic subject={subject} createdTopic={createdTopic}></NewTopic>
+<!--            <NewTopic subject={subject} createdTopic={createdTopic}></NewTopic>-->
           {/if}
           {#if mode === 'edit'}
-            <EditTopic topic={topic} updatedTopic={updatedTopic}></EditTopic>
+<!--            <EditTopic topic={topic} updatedTopic={updatedTopic}></EditTopic>-->
           {/if}
         </div>
         <div class="ml-2 h-full">
           {#if !topics || topics.length === 0}
-            <div>no topics for subject: {nextSubject.name}</div>
+            <div>no topics for subject: {nextMeetupTemplate.name}</div>
           {:else}
             <div class="bg-amber-100 text-amber-950 px-2">assigned topics</div>
-            <ListTopics topics={topics} selected={selectedTopic}></ListTopics>
+<!--            <ListTopics topics={topics} selected={selectedTopic}></ListTopics>-->
           {/if}
         </div>
       </div>

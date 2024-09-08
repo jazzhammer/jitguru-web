@@ -1,39 +1,22 @@
 <style>
-  .search-subject {
+  .search-meetup-template {
     width: 100%;
     text-align: left;
   }
 
 </style>
 <script lang="ts">
-import SubjectsStore from "../../../stores/subjects-store";
-import store from "../../../stores/types";
-import {type Subject} from "../../../models/subject";
-import SubjectService from "../../../services/subject-service";
 
-let newSubject: Partial<Subject> = {
-  name: ''
-};
-export let created = (next: Subject): void => {
+import {type MeetupTemplate} from "../../../models/meetup-template";
+import MeetupTemplateService from "../../../services/meetup-template-service";
+
+
+export let created = (next: MeetupTemplate): void => {
   console.log(`created ${JSON.stringify(created)}`);
 };
-let canCreate = false;
-$: canCreate = newSubject.name && newSubject.name.trim().length > 0;
 
-const create = (): void => {
-  SubjectService.create({
-    ...newSubject
-  }).then((response) => {
-    const created = response.data.created;
-    SubjectsStore.set({
-      type: store.CREATE,
-      payload: created
-    });
-    created(created)
-  });
-}
 
-export let found = (next: Subject[]): void => {
+export let found = (next: MeetupTemplate[]): void => {
   console.log(`found ${JSON.stringify(next)}`);
 }
 
@@ -44,7 +27,7 @@ const search = (): void => {
     clearTimeout(searchTimeout);
   }
   searchTimeout = setTimeout(() => {
-    SubjectService.find({
+    MeetupTemplateService.find({
       name: search_term
     }).then((response) => {
       const founds = response.data.matched;
@@ -53,8 +36,8 @@ const search = (): void => {
   }, 450);
 }
 </script>
-<div class="search flex flex-col">
-  <div class="bg-amber-100 text-amber-950 px-2">browse subjects</div>
+<div class="search-meetup-template flex flex-col">
+  <div class="bg-amber-100 text-amber-950 px-2">browse meetup_templates</div>
   <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 300px; padding-left: 8px; margin-top: 8px;">
     <div>search</div>
     <div>

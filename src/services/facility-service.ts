@@ -1,28 +1,28 @@
 
 import {API_BASE_URL} from'../settings/api-settings';
 import axios from "axios";
-import {type Subject} from "../models/subject";
+import {type Facility} from "../models/facility";
 
-export interface SubjectSearchDto {
+export interface FacilitySearchDto {
   id?: number;
   name ?: string;
 }
 
-const SubjectService = {
-  find: (searchDto: SubjectSearchDto): Promise<any> => {
-    return axios.get(`${API_BASE_URL}subjects`, {
+const FacilityService = {
+  find: (searchDto: FacilitySearchDto): Promise<any> => {
+    return axios.get(`${API_BASE_URL}facilitys`, {
       params: searchDto
     })
   },
-  create: (subjectDto: Partial<Subject>): Promise<any> => {
-    return axios.post(`${API_BASE_URL}subjects`, {
-      ...subjectDto
+  create: (facilityDto: Partial<Facility>): Promise<any> => {
+    return axios.post(`${API_BASE_URL}facilitys`, {
+      ...facilityDto
     })
   },
-  update: (subjectDto: Partial<Subject>): Promise<any> => {
-    return axios.put(`${API_BASE_URL}subjects`, {
-      ...subjectDto
+  update: (facilityDto: Partial<Facility>): Promise<any> => {
+    return axios.put(`${API_BASE_URL}facilitys`, {
+      ...facilityDto
     })
   }
 }
-export default SubjectService;
+export default FacilityService;

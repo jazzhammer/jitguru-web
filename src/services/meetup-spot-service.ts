@@ -1,28 +1,31 @@
 
 import {API_BASE_URL} from'../settings/api-settings';
 import axios from "axios";
-import {type Subject} from "../models/subject";
+import {type MeetupSpot} from "../models/meetup_spot";
 
-export interface SubjectSearchDto {
+export interface MeetupSpotSearchDto {
   id?: number;
   name ?: string;
+  description?: string;
+  spot_type_id?: number;
+  facility_id?: number;
 }
 
-const SubjectService = {
-  find: (searchDto: SubjectSearchDto): Promise<any> => {
-    return axios.get(`${API_BASE_URL}subjects`, {
+const MeetupSpotService = {
+  find: (searchDto: MeetupSpotSearchDto): Promise<any> => {
+    return axios.get(`${API_BASE_URL}meetup_spots`, {
       params: searchDto
     })
   },
-  create: (subjectDto: Partial<Subject>): Promise<any> => {
-    return axios.post(`${API_BASE_URL}subjects`, {
-      ...subjectDto
+  create: (meetup_spotDto: Partial<MeetupSpot>): Promise<any> => {
+    return axios.post(`${API_BASE_URL}meetup_spots`, {
+      ...meetup_spotDto
     })
   },
-  update: (subjectDto: Partial<Subject>): Promise<any> => {
-    return axios.put(`${API_BASE_URL}subjects`, {
-      ...subjectDto
+  update: (meetup_spotDto: Partial<MeetupSpot>): Promise<any> => {
+    return axios.put(`${API_BASE_URL}meetup_spots`, {
+      ...meetup_spotDto
     })
   }
 }
-export default SubjectService;
+export default MeetupSpotService;

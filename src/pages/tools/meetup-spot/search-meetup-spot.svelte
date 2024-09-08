@@ -1,40 +1,22 @@
 <style>
-  .search-crew-template {
+  .search-meetup-spot {
     width: 100%;
     text-align: left;
   }
 
 </style>
 <script lang="ts">
-import store from "../../../stores/types";
-import {type CrewTemplate} from "../../../models/crew-template";
-import CrewTemplateService from "../../../services/crew-template-service";
-import CrewTemplatesStore from "../../../stores/crew-templates-store";
+import {type MeetupSpot} from "../../../models/meetup_spot";
+import MeetupSpotService from "../../../services/meetup-spot-service";
 
-let newCrewTemplate: Partial<CrewTemplate> = {
+let newMeetupSpot: Partial<MeetupSpot> = {
   name: ''
 };
-export let created = (next: CrewTemplate): void => {
+export let created = (next: MeetupSpot): void => {
   console.log(`created ${JSON.stringify(created)}`);
 };
 
-let canCreate = false;
-$: canCreate = newCrewTemplate.name && newCrewTemplate.name.trim().length > 0;
-
-const create = (): void => {
-  CrewTemplateService.create({
-    ...newCrewTemplate
-  }).then((response) => {
-    const created = response.data.created;
-    CrewTemplatesStore.set({
-      type: store.CREATE,
-      payload: created
-    });
-    created(created)
-  });
-}
-
-export let found = (next: CrewTemplate[]): void => {
+export let found = (next: MeetupSpot[]): void => {
   console.log(`found ${JSON.stringify(next)}`);
 }
 
@@ -45,7 +27,7 @@ const search = (): void => {
     clearTimeout(searchTimeout);
   }
   searchTimeout = setTimeout(() => {
-    CrewTemplateService.find({
+    MeetupSpotService.find({
       name: search_term
     }).then((response) => {
       const founds = response.data.matched;
@@ -55,7 +37,7 @@ const search = (): void => {
 }
 </script>
 <div class="search flex flex-col">
-  <div class="bg-amber-100 text-amber-950 px-2 text-left">browse crew-templates</div>
+  <div class="bg-amber-100 text-amber-950 px-2 text-left">browse meetup_spots</div>
   <div style="display: grid; grid-template-columns: 1fr 2fr; max-width: 300px; padding-left: 8px; margin-top: 8px;">
     <div>search</div>
     <div>

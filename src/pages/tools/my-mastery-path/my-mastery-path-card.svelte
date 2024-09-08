@@ -13,7 +13,7 @@
     padding-left: 8px;
   }
   .tool-description {
-    padding-left: 8px;
+    padding: 8px;
   }
 
 </style>
@@ -42,19 +42,20 @@
   <div class="tool-swatch border-2 border-amber-700 bg-amber-50 flex flex-col">
     <div class="tool-name bg-amber-900 text-amber-50 flex flex-row"
          style="height: 30px">
-      <div>meetup&nbsptemplates</div>
+      <div>my&nbsp;mastery&nbsp;path</div>
       <div style="width:100%"></div>
       {#if security && security.loggedInUser}
-        <div on:click={() => addToolToMe('meetup_templates')} class="hover:bg-amber-50 hover:text-amber-950 border-2 px-4 border-amber-50"
+        <div on:click={() => addToolToMe('my_mastery_path')} class="hover:bg-amber-50 hover:text-amber-950 border-2 px-4 border-amber-50"
              style="margin-bottom: 2px; border-radius: 2px; cursor: pointer;">
           add2me
         </div>
       {/if}
     </div>
-    <div class="tool-description text-blue-950">a description of what should happen in a meetup, including but not limited to:
-      <li>persons that are expected to attend,</li>
-      <li>their respective roles and </li>
-      <li>the meetup's expected outcomes</li>
+    <div class="tool-description text-blue-950">
+      plan, execute, and monitor your path to mastery of through
+      <li>your selection of meetups with gurus and topics,</li>
+      <li>attendance at meetups for targeted mentorship, and</li>
+      <li>building upon successes to reach your ultimate goals</li>
     </div>
   </div>
 </div>

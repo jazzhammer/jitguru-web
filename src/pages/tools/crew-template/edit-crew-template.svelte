@@ -125,18 +125,14 @@ const updatedTemplateRole = (next: TemplateRole): void => {
       style="border-radius: 3px; min-width: 90px; max-width: 250px; margin-top:12px;"
   >update crew_template</div>
   {/if}
-  <div class="tool text-amber-950 text-left flex flex-col mb-10" style="position: relative;">
+  <div class="tool text-amber-950 text-left flex flex-col mb-10"
+       style="position: relative; margin-top: 20px;">
     <div class="border-b-2 border-garden-100 mb-4"
          style="width: calc(100% - 5px); position: absolute; top: 0px; left: -8px;"
     >
-      <!--    <div class="border-garden-100"-->
-      <!--         style="width: 100%; position: absolute; top: 10px; left: 0px; border-bottom: 1px solid">-->
-            &nbsp;
-      <!--    </div>&nbsp;-->
-
     </div>
     <div class="bg-garden-200 text-amber-100 px-4"
-         style="position: absolute; left: 2px; top: 12px"
+         style="position: absolute; left: 2px; top: -12px"
     >
       template_roles for {crewTemplate.name}
     </div>
@@ -171,4 +167,18 @@ const updatedTemplateRole = (next: TemplateRole): void => {
         </div>
       </div>
   </div>
+  {#if crewTemplate}
+    <div class="tool text-amber-950 text-left flex flex-col mb-10"
+         style="position: relative; margin-top: 20px;">
+      <div class="border-b-2 border-garden-100 mb-4"
+           style="width: calc(100% - 5px); position: absolute; top: 0px; left: -8px;"
+      >
+      </div>
+      <div class="bg-garden-200 text-amber-100 px-4"
+           style="position: absolute; left: 2px; top: -12px"
+      >
+        crews created from {crewTemplate.name}
+      </div>
+    </div>
+  {/if}
 </div>

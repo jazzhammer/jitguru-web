@@ -1,5 +1,5 @@
 <style>
-  .meetup-templates {
+  .my-mastery-path {
     width: 100%;
     text-align: left;
   }
@@ -14,12 +14,12 @@
   }
 </style>
 <script lang="ts">
-  import NewMeetupTemplate from './new-meetup-template.svelte';
-  import SearchMeetupTemplate from './search-meetup-template.svelte';
-  import ListMeetupTemplates from './list-meetup-templates.svelte';
+  // import NewMeetupTemplate from './new-meetup-template.svelte';
+  // import SearchMeetupTemplate from './search-meetup-template.svelte';
+  // import ListMeetupTemplates from './list-my-mastery-path.svelte';
   // import EditMeetupTemplate from './edit-meetup-template.svelte';
   import {type MeetupTemplate} from "../../../models/meetup-template";
-  import MeetupTemplatesStore from "../../../stores/meetup-templates-store";
+  // import MeetupTemplatesStore from "../../../stores/my-mastery-path-store";
   import store from "../../../stores/types";
   let mode = 'search';
   $: mode
@@ -57,10 +57,10 @@
   const selectedMeetupTemplate = (next: MeetupTemplate): void => {
     meetupTemplate = next;
     mode = 'edit';
-    MeetupTemplatesStore.set({
-      type: store.READ,
-      payload: meetupTemplate
-    });
+    // MeetupTemplatesStore.set({
+    //   type: store.READ,
+    //   payload: meetupTemplate
+    // });
   }
 
   const updatedMeetupTemplate = (next: MeetupTemplate) => {
@@ -68,35 +68,35 @@
   }
 
 </script>
-<div class="meetup-templates">
+<div class="my-mastery-path">
   <div class="menu ml-3">
-    {#if mode !== 'new'}
-      <div on:click={() => setMode('new')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"
-           style="border-radius: 3px;"
-      >
-        new
-      </div>
-    {/if}
-    {#if mode !== 'search'}
-      <div on:click={() => setMode('search')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"
-           style="border-radius: 3px;"
-      >
-        search
-      </div>
-    {/if}
+    <!--{#if mode !== 'new'}-->
+    <!--  <div on:click={() => setMode('new')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"-->
+    <!--       style="border-radius: 3px;"-->
+    <!--  >-->
+    <!--    new-->
+    <!--  </div>-->
+    <!--{/if}-->
+    <!--{#if mode !== 'search'}-->
+    <!--  <div on:click={() => setMode('search')} class="menu-item border-2 border-amber-700 text-center hover:bg-blue-200 cursor-pointer"-->
+    <!--       style="border-radius: 3px;"-->
+    <!--  >-->
+    <!--    search-->
+    <!--  </div>-->
+    <!--{/if}-->
   </div>
   <div class="ml-3 mt-3">
-    {#if mode === 'new'}
-      <NewMeetupTemplate createdMeetupTemplate="{createdMeetupTemplate}"></NewMeetupTemplate>
-    {/if}
-    {#if mode === 'search'}
-      <SearchMeetupTemplate found="{found}"></SearchMeetupTemplate>
-      {#if meetupTemplates && meetupTemplates.length > 0}
-        <ListMeetupTemplates meetupTemplates={meetupTemplates} selected={selectedMeetupTemplate}></ListMeetupTemplates>
-      {/if}
-    {/if}
-    {#if mode === 'edit'}
-      <EditMeetupTemplate updatedMeetupTemplate="{updatedMeetupTemplate}"></EditMeetupTemplate>
-    {/if}
+    <!--{#if mode === 'new'}-->
+    <!--  <NewMeetupTemplate createdMeetupTemplate="{createdMeetupTemplate}"></NewMeetupTemplate>-->
+    <!--{/if}-->
+    <!--{#if mode === 'search'}-->
+    <!--  <SearchMeetupTemplate found="{found}"></SearchMeetupTemplate>-->
+    <!--  {#if meetupTemplates && meetupTemplates.length > 0}-->
+    <!--    <ListMeetupTemplates meetupTemplates={meetupTemplates} selected={selectedMeetupTemplate}></ListMeetupTemplates>-->
+    <!--  {/if}-->
+    <!--{/if}-->
+    <!--{#if mode === 'edit'}-->
+    <!--  <EditMeetupTemplate updatedMeetupTemplate="{updatedMeetupTemplate}"></EditMeetupTemplate>-->
+    <!--{/if}-->
   </div>
 </div>

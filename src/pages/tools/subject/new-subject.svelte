@@ -10,6 +10,7 @@ import SubjectsStore from "../../../stores/subjects-store";
 import store from "../../../stores/types";
 import {type Subject} from "../../../models/subject";
 import SubjectService from "../../../services/subject-service";
+import MessagesStore from "../../../stores/messages-store.js";
 
 let newSubject: Partial<Subject> = {
   name: ''
@@ -28,6 +29,12 @@ const create = (): void => {
     SubjectsStore.set({
       type: store.CREATE,
       payload: created
+    });
+    MessagesStore.update(old => {
+      return {
+        ...old,
+        subject: `subject created: ${created.name}`
+      }
     });
     createdSubject(created)
   });

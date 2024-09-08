@@ -7,6 +7,7 @@ export interface TopicSearchDto {
   id?: number;
   name ?: string;
   crew_template_id?: number;
+  subject_id?: number;
 }
 
 const TopicService = {

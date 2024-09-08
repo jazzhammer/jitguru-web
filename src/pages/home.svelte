@@ -231,6 +231,7 @@
    *             /_____/     \/
    **/
   async function setupUserOrgs(user_id) {
+    // console.log(`setupUserOrgs`)
     const response = await fetch(`${API_BASE_URL}users/orgs?user_id=${user_id}`);
     const orgsJson = await response.json();
     OrgsStore.update(old => {
@@ -248,7 +249,7 @@
               // console.log(`org.id ${org.id} vs ${parseInt(preferences[PREF_SELECTED_ORG_ID])}`);
               return org.id === parseInt(preferences[PREF_SELECTED_ORG_ID]);
             });
-            console.log(`stored selected org: ${JSON.stringify(next.selected)}`);
+            // console.log(`stored selected org: ${JSON.stringify(next.selected)}`);
           } else {
             console.log(`no selected org preference. unable to set selected org to preference`);
           }
@@ -260,6 +261,7 @@
       if (!next.selected) {
         next.selected = orgsJson.assigned && orgsJson.assigned.length > 0 ? orgsJson[0] : null;
       }
+      // console.log(`returning next orgstore ${JSON.stringify(next)}`)
       return next;
     });
   }
@@ -359,6 +361,11 @@
     showOrgSelector(false);
     const org = dispatchEvent.detail;
     if (org) {
+
+      OrgsStore.set({
+        type: store.READ,
+        payload: org
+      });
 
       const response = await fetch(`${API_BASE_URL}facilitys?org_id=${org.id}`, {
         method: 'GET'
@@ -507,7 +514,7 @@
     <div class="bg-leather-800 ml-2 text-sm font-bold pt-1 pl-1 pr-1 cursor-pointer hover:bg-amber-400 hover:text-black relative">
       <div on:click={() => toggleOrgSelector()}>org</div>
       {#if orgSelector}
-        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm">
+        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm" style="z-index: 1000">
           <OrgSelector on:selectedOrg={onSelectOrg} on:createdOrg={() => {showOrgSelector(false)}}></OrgSelector>
         </div>
       {/if}
@@ -546,7 +553,7 @@
 
       </div>
       {#if facilitySelector}
-        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black">
+        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black" style="z-index: 1000">
           <FacilitySelector on:selectedFacility={onSelectFacility}></FacilitySelector>
         </div>
       {/if}
@@ -571,7 +578,7 @@
         {/if}
       </div>
       {#if meetupSpotSelector}
-        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black">
+        <div class="absolute top-7 left-0 bg-white border-2 border-garden-200 w-fit text-sm text-black" style="z-index: 1000">
           <MeetupSpotSelector on:selectedMeetupSpot={onSelectMeetupSpot}></MeetupSpotSelector>
         </div>
       {/if}

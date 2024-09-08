@@ -21,6 +21,18 @@
   import {type Subject} from "../../../models/subject";
   import SubjectsStore from "../../../stores/subjects-store";
   import store from "../../../stores/types";
+
+  import MessagesStore from "../../../stores/messages-store.js";
+
+  let message = '';
+  $: message
+  const unsubMessages = MessagesStore.subscribe((next: any) => {
+    message = next.subject;
+    setTimeout(() => {
+      message = '';
+    }, 4000);
+  });
+
   let mode = 'search';
   $: mode
   const setMode = (next: string): void => {
@@ -83,6 +95,9 @@
       >
         search
       </div>
+    {/if}
+    {#if message}
+    <div>{message}</div>
     {/if}
   </div>
   <div class="ml-3 mt-3">

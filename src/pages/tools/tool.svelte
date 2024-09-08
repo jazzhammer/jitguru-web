@@ -8,7 +8,8 @@
   import CrewTemplates from './crew-template/crew-templates.svelte';
   import MeetupTemplates from './meetup-template/meetup-templates.svelte';
   import Subjects from './subject/subjects.svelte';
-
+  import Persons from './person/persons.svelte';
+  import MyMasteryPath from './my-mastery-path/my-mastery-path.svelte';
   export let toolName;
   $: toolName
 
@@ -35,8 +36,14 @@
     {#if toolName === 'meetup_templates'}
       <MeetupTemplates></MeetupTemplates>
     {/if}
+    {#if toolName === 'meetup_templates'}
+      <MyMasteryPath></MyMasteryPath>
+    {/if}
     {#if toolName === 'subjects'}
       <Subjects></Subjects>
+    {/if}
+    {#if toolName === 'persons'}
+      <Persons></Persons>
     {/if}
   </div>
 </div>

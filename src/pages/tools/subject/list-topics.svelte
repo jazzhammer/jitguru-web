@@ -1,6 +1,6 @@
 <style>
   .list-topics {
-    width: 200px;
+    width: 400px;
     display: grid;
     grid-template-columns: 1fr;
     margin-left: 0px;

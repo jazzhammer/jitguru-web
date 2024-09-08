@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {API_BASE_URL} from "../../../settings/api-settings.js";
   import {PREF_SELECTED_ORG_ID} from "../../../models/user-preference.ts"
   import {createEventDispatcher} from "svelte";
@@ -8,6 +8,7 @@
   import SecurityStore from "../../../stores/security-store.js";
   import OrgSearch from './org-search.svelte';
   import OrgCreate from './org-create.svelte';
+  import store from './../../../stores/types'
 
   let mode = 'select_org';
 
@@ -34,6 +35,10 @@
         selected: org,
         action: ACTION_SELECTED
       }
+    });
+    OrgsStore.set({
+      type: store.READ,
+      payload: org
     });
     if (security.loggedInUser) {
       fetch(`${API_BASE_URL}users/preference`, {
