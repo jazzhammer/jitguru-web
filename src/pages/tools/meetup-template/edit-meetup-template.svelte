@@ -24,7 +24,6 @@ import MeetupTemplateService from '../../../services/meetup-template-service';
 import OrgsStore from './../../../stores/orgs-store';
 import {type Org} from '../../../models/org';
 import {type Topic} from '../../../models/topic';
-import TopicsStore from '../../../stores/topics-store';
 import {onDestroy} from "svelte";
 import TopicService from "../../../services/topic-service";
 import {type Facility} from "../../../models/facility";
@@ -41,9 +40,15 @@ import SearchMeetupSpot from './../meetup-spot/search-meetup-spot.svelte';
 import ListMeetupSpots from './../meetup-spot/list-meetup-spots.svelte';
 import SearchFacility from './../facility/search-facility.svelte';
 import ListFacilitys from './../facility/list-facilitys.svelte';
+import SearchOrg from './../org/search-org.svelte';
+import ListOrgs from './../org/list-orgs.svelte';
 import MessagesStore from './../../../stores/messages-store';
+import OrgService from "../../../services/org-service";
 export let editableMeetupTemplate: MeetupTemplate;
 $: editableMeetupTemplate
+
+let org: Org;
+$: org
 
 let facility: Facility;
 $: facility
@@ -78,6 +83,22 @@ const subjectForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise
         response.data.matched[0] :
         null;
       return subject;
+    }
+    return null;
+  }
+  return null;
+}
+
+const orgForMeetupTemplate = async (meetupTemplate: MeetupTemplate): Promise<Org> => {
+  if (meetupTemplate) {
+    if (meetupTemplate.org) {
+      const response = await OrgService.find({
+        id: meetupTemplate.org
+      });
+      const org = response.data.matched && response.data.matched.length > 0 ?
+        response.data.matched[0] :
+        null;
+      return org;
     }
     return null;
   }
@@ -148,6 +169,10 @@ subjectForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
   subject = found;
 });
 
+orgForMeetupTemplate(editableMeetupTemplate).then((found) =>  {
+  org = found;
+});
+
 if (editableMeetupTemplate) {
   if (editableMeetupTemplate.meetup_spot) {
     MeetupSpotService.find({
@@ -163,24 +188,23 @@ if (editableMeetupTemplate) {
 let nextMeetupTemplate: Partial<MeetupTemplate> = {
   id: editableMeetupTemplate?.id,
   name: editableMeetupTemplate?.name,
+  org: editableMeetupTemplate?.org,
   work_in_progress: editableMeetupTemplate?.work_in_progress
 };
-let org: Org;
-$: org
 
 const unsubOrg = OrgsStore.subscribe((crud: any) => {
   if (crud && crud.type == store.READ) {
     org = crud.payload;
     // console.log(`org payload: ${org?.name}`)
   }
-  else if (crud && crud.selected) {
-    org = crud.selected;
-    editableMeetupTemplate.org_id = org.id;
-    // console.log(`org selected: ${org?.name}`)
-  }
-  else {
-    // console.log(`org store: ${JSON.stringify(crud)}`)
-  }
+  // else if (crud && crud.selected) {
+  //   org = crud.selected;
+  //   editableMeetupTemplate.org_id = org.id;
+  //   // console.log(`org selected: ${org?.name}`)
+  // }
+  // else {
+  //   // console.log(`org store: ${JSON.stringify(crud)}`)
+  // }
 });
 
 export let updatedMeetupTemplate = (updated: MeetupTemplate): void => {
@@ -310,6 +334,24 @@ const selectNextFacility = (next: Facility): void => {
 }
 
 
+let orgs: Org[];
+$: orgs
+const foundOrgs = (next: Org[]): void => {
+  orgs = next;
+}
+
+const selectNextOrg = (next: Org): void => {
+  nextMeetupTemplate.org_id = next.id
+  org = next;
+  setEditing(null);
+  update();
+  MessagesStore.set({
+    type: 'edit-meetup-template',
+    message: `updated meetup_template with org ${org.name}`
+  });
+}
+
+
 
 let message = ''
 $: message
@@ -338,8 +380,10 @@ onDestroy(unsubMessage);
          style="position: relative"
     ><div on:click={() => setEditing('org')}>{org?.name}</div>
       {#if editing === 'org'}
-        <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px"
-             class="border-2 border:black bg-garden-100">
+        <div style="min-height: 40px; min-width: 200px; position: absolute; left: 4px; top: 24px; z-index: 1000;"
+             class="border-2 border-amber-700 bg-white rounded-sm">
+          <SearchOrg found={foundOrgs}></SearchOrg>
+          <ListOrgs selected={selectNextOrg} orgs={orgs}></ListOrgs>
         </div>
       {/if}
     </div>

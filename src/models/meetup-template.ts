@@ -4,6 +4,7 @@ export interface MeetupTemplate {
   deleted: boolean;
   crew_template_id: number;
   org_id: number;
+  org: number;
   facility_id: number;
   meetup_spot_id: number; 
   focus_id: number;

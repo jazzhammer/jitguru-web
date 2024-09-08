@@ -10,7 +10,6 @@ export interface FacilitySearchDto {
 
 const FacilityService = {
   find: (searchDto: FacilitySearchDto): Promise<any> => {
-    debugger;
     return axios.get(`${API_BASE_URL}facilitys`, {
       params: searchDto
     })
